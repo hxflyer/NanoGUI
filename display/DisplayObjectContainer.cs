@@ -25,7 +25,6 @@ public class DisplayObjectContainer : DisplayObject {
 	public void addChild(DisplayObject child){
 		_childList.Add(child);
 		child.parent		= this;
-		child.hasParent		= true;
 		setTransformInTreeDirty();
 		setOriginalSizeDirty();
 	}
@@ -33,7 +32,6 @@ public class DisplayObjectContainer : DisplayObject {
 	public void addChildAt(int depth, DisplayObject child){
 		_childList.Insert(depth,child);
 		child.parent		= this;
-		child.hasParent		= true;
 		setTransformInTreeDirty();
 		setOriginalSizeDirty();
 	}
@@ -42,7 +40,6 @@ public class DisplayObjectContainer : DisplayObject {
 		
 		_childList.Remove(child);
 		child.parent		= null;
-		child.hasParent		= false;
 		setOriginalSizeDirty();
 	}
 	
@@ -50,7 +47,6 @@ public class DisplayObjectContainer : DisplayObject {
 		for(int i=0;i<_childList.Count;i++){
 			DisplayObject child = _childList[i] as DisplayObject;
 			child.parent	= null;
-			child.hasParent	= false;
 		}
 		_childList.RemoveRange(0,_childList.Count);
 		setOriginalSizeDirty();

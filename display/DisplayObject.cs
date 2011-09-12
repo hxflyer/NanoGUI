@@ -10,7 +10,7 @@ public class DisplayObject : EventDispatcher {
 
 	}
 	
-	public string id = "";
+	
 	
 	
 	
@@ -49,7 +49,7 @@ public class DisplayObject : EventDispatcher {
 		_transform.scale(_scaleX,_scaleY);
 		
 		setTransformInTreeDirty();
-		if(_hasParent){
+		if(_parent!=null){
 			_parent.setOriginalSizeDirty();
 		}
 	}
@@ -103,8 +103,8 @@ public class DisplayObject : EventDispatcher {
     	set { 
 			_x = value;
 			_transform.setTranslateX(_x);
-			
-			if(_hasParent){
+			setTransformInTreeDirty();
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -116,7 +116,8 @@ public class DisplayObject : EventDispatcher {
     	set { 
 			_y = value;
 			_transform.setTranslateY(_y);
-			if(_hasParent){
+			setTransformInTreeDirty();
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -131,7 +132,7 @@ public class DisplayObject : EventDispatcher {
 				_scaleX	= _width/_originalWidth;
 			}
 			_isTransformDirty	= true;
-			if(_hasParent){
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -146,7 +147,7 @@ public class DisplayObject : EventDispatcher {
 				_scaleY	= _height/_originalHeight;
 			}
 			_isTransformDirty	= true;
-			if(_hasParent){
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -161,7 +162,7 @@ public class DisplayObject : EventDispatcher {
 				_width	= _scaleX*_originalWidth;
 			}
 			_isTransformDirty	= true;
-			if(_hasParent){
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -176,7 +177,7 @@ public class DisplayObject : EventDispatcher {
 				_height	= _scaleY*_originalHeight;
 			}
 			_isTransformDirty	= true;
-			if(_hasParent){
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -188,7 +189,7 @@ public class DisplayObject : EventDispatcher {
     	set {
 			_rotation = value;
 			_isTransformDirty	= true;
-			if(_hasParent){
+			if(_parent!=null){
 				_parent.setOriginalSizeDirty();
 			}
 		}
@@ -214,7 +215,7 @@ public class DisplayObject : EventDispatcher {
 			return;
 		}
 		_isOriginalSizeDirty	= true;
-		if(_parent){
+		if(_parent!=null){
 			_parent.setOriginalSizeDirty();
 		}
 	}
@@ -281,12 +282,7 @@ public class DisplayObject : EventDispatcher {
 	 ***************************************/
 	
 	protected DisplayObjectContainer _parent;
-	protected bool _hasParent	= false;
-	
-	public bool hasParent {
-    	get { return _hasParent; }
-    	set { _hasParent = value;}
-	}
+
 	
 	public DisplayObjectContainer parent {
     	get { return _parent; }

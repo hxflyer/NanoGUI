@@ -34,17 +34,19 @@ public class GuiManager : MonoBehaviour {
 		_instance	= this.GetComponent("GuiManager") as GuiManager;
 	}
 	
+	
 	// Update is called once per frame
 	void Update () {
-		
+		NanoTween.update();
 	}
 	
 	void OnGUI(){
-		_stage.updateTransform();
-		_stage.updateTransformInTree();
-		_stage.updateOriginalSize();
-		_stage.updateBoundRect();
-		_stage.render();
+		
+		stage.updateTransform();
+		stage.updateTransformInTree();
+		stage.updateOriginalSize();
+		stage.updateBoundRect();
+		stage.render();
 		
 		
 		//mouse event
