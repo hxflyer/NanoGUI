@@ -14,16 +14,20 @@ public class GuiBuildTest : MonoBehaviour {
 		img1.alpha		= 0.5f;
 		img1.x			= 350.0f;
 		img1.scaleX		= 0.5f;
-
+		img1.id			= "img1";
+		
 		Sprite img2		= new Sprite(texture);
 
 		img1.addChild(img2);
 		img2.y			= 150.0f;
-		img2.scaleX		= 0.2f;
+		img2.scaleX		= 0.5f;
+		img2.scaleY		= 0.5f;
 		img2.alpha		= 0.5f;
-		
+		img2.id			= "img2";
 		img2.addEventListner(MouseEvent.MOUSE_DOWN,
 		                     new EventDispatcher.CallBack(img2MouseDown));
+		
+		
 	}
 	
 	

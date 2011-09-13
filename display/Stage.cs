@@ -65,11 +65,12 @@ public class Stage : DisplayObjectContainer {
 				minChildPos.y	= child.y;
 			}
 		}
+		
 		_originalWidth	-= minChildPos.x;
 		_originalHeight	-= minChildPos.y;
 		_width	= _originalWidth *_scaleX;
 		_height	= _originalHeight *_scaleY;
 		
-		updateBoundRect();
+		setBoundRectDirty();
 	}
 }

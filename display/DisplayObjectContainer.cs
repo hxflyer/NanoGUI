@@ -131,7 +131,7 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 		
 		_boundRect.x		= minChildPos.x * _transformInTreeScale.x + _transformInTree.tx;
-		_boundRect.y		= minChildPos.x * _transformInTreeScale.y + _transformInTree.ty;
+		_boundRect.y		= minChildPos.y * _transformInTreeScale.y + _transformInTree.ty;
 		_boundRect.width	= _originalWidth * _transformInTreeScale.x;
 		_boundRect.height	= _originalHeight * _transformInTreeScale.y;
 	}

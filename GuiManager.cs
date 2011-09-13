@@ -51,18 +51,23 @@ public class GuiManager : MonoBehaviour {
 		
 		//mouse event
 		
+		
 		if (Event.current.button == 0 && Event.current.type == EventType.MouseDown) {
 			recursionHitTest(_stage,MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
 		}
+		
+		
 		if (Event.current.button == 0 && Event.current.type == EventType.MouseUp) {
-			recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
+			//recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
 		}
+		
 	}
 	
 	
 	
 	bool recursionHitTest(DisplayObject target,string type,Vector2 position){
 		
+		Debug.Log(target.id + "/" + target.boundRect);
 		
 		bool isHit = false;
 		
@@ -76,9 +81,10 @@ public class GuiManager : MonoBehaviour {
 			// go loop the child
 			
 			if(target is DisplayObjectContainer){
-				DisplayObjectContainer	t	= (target as DisplayObjectContainer);
+				DisplayObjectContainer	t	= target as DisplayObjectContainer;
 				for(int i=t.childList.Count-1;i>=0;i--){
 					if(recursionHitTest(t.childList[i] as DisplayObject,type,position)){
+						isHit	= true;
 						break;
 					}
 				}
@@ -86,7 +92,7 @@ public class GuiManager : MonoBehaviour {
 			
 			
 			if(isHit){
-				//Debug.Log("hit : "+ MouseEvent.MOUSE_DOWN +"  "+  target.id + "  "+position);
+				Debug.Log("hit : "+ MouseEvent.MOUSE_DOWN +"  "+  target.id + "  "+position);
 				target.dispatchEvent(new MouseEvent(target,type,position,new Vector2(position.x-target.transformInTree.tx,position.y-target.transformInTree.ty)));
 			}
 		}
