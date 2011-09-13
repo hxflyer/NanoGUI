@@ -67,7 +67,7 @@ public class GuiManager : MonoBehaviour {
 	
 	bool recursionHitTest(DisplayObject target,string type,Vector2 position){
 		
-		Debug.Log(target.id + "/" + target.boundRect);
+		//Debug.Log(target.id + "/" + target.boundRect);
 		
 		bool isHit = false;
 		
@@ -92,7 +92,7 @@ public class GuiManager : MonoBehaviour {
 			
 			
 			if(isHit){
-				Debug.Log("hit : "+ MouseEvent.MOUSE_DOWN +"  "+  target.id + "  "+position);
+				//Debug.Log("hit : "+ MouseEvent.MOUSE_DOWN +"  "+  target.id + "  "+position);
 				target.dispatchEvent(new MouseEvent(target,type,position,new Vector2(position.x-target.transformInTree.tx,position.y-target.transformInTree.ty)));
 			}
 		}

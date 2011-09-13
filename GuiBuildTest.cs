@@ -11,7 +11,7 @@ public class GuiBuildTest : MonoBehaviour {
 
 		GuiManager.stage.addChild(img1);
 		
-		img1.alpha		= 0.5f;
+		/*img1.alpha		= 0.5f;
 		img1.x			= 350.0f;
 		img1.scaleX		= 0.5f;
 		img1.id			= "img1";
@@ -25,7 +25,7 @@ public class GuiBuildTest : MonoBehaviour {
 		img2.alpha		= 0.5f;
 		img2.id			= "img2";
 		img2.addEventListner(MouseEvent.MOUSE_DOWN,
-		                     new EventDispatcher.CallBack(img2MouseDown));
+		                     new EventDispatcher.CallBack(img2MouseDown));*/
 		
 		
 	}

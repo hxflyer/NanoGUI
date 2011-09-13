@@ -29,11 +29,16 @@ public class DisplayObjectContainer : DisplayObject {
 		setOriginalSizeDirty();
 	}
 	
-	public void addChildAt(int depth, DisplayObject child){
-		_childList.Insert(depth,child);
+	public void addChildAt(int index, DisplayObject child){
+		_childList.Insert(index,child);
 		child.parent		= this;
 		setTransformInTreeDirty();
 		setOriginalSizeDirty();
+	}
+	
+	public void setChildIndex(DisplayObject child,int index){
+		_childList.Remove(child);
+		_childList.Insert(index,child);
 	}
 	
 	public void removeChild(DisplayObject child){
@@ -52,6 +57,9 @@ public class DisplayObjectContainer : DisplayObject {
 		setOriginalSizeDirty();
 	}
 	
+	public int numChildren{
+		get {return _childList.Count;}
+	}
 	
 	
 	/***************************************

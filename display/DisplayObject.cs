@@ -38,7 +38,7 @@ public class DisplayObject : EventDispatcher {
 	}
 	
 	public virtual void updateTransform(){
-		
+		this.dispatchEvent(new GuiEvent(this,GuiEvent.ENTER_FRAME));
 		if(!_isTransformDirty){
 			return;
 		}
