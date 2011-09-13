@@ -98,7 +98,8 @@ public class NanoTween : EventDispatcher {
 			argName	= args[i] as string;
 			
 			if(argName	== "ease"){
-				_easeFunction	= _ease.getEasingFunction(args[i+1] as string);
+				_easeType		= args[i+1] as string;
+				_easeFunction	= _ease.getEasingFunction(_easeType);
 			}else if(argName == "delay"){
 				_delay	= (float)args[i+1];
 			}else if(argName == ON_COMPLETE){
@@ -150,10 +151,7 @@ public class NanoTween : EventDispatcher {
 		get {return _easeFunction;}
 	}
 	
-	private Hashtable _args;
-	public Hashtable args{
-		get {return _args;}
-	}
+
 	private ArrayList _startArgs;
 	private ArrayList _endArgs;
 	private ArrayList _argsName;

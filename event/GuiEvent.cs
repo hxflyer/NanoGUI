@@ -1,16 +1,16 @@
 using UnityEngine;
 using System.Collections;
 
-public class GuiEvent : Object {
+public class GuiEvent {
 
 
 	public string eventType;
-	public EventDispatcher dispatchTarget;
+	public EventDispatcher target;
 	
 	public GuiEvent (){
 	}
 	public GuiEvent (EventDispatcher target,string type) {
-		dispatchTarget = target;
+		this.target = target;
 		eventType	= type;
 	}
 	
