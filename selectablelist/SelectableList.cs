@@ -61,6 +61,10 @@ public class SelectableList :SelectableItem {
 		this.dispatchEvent(new GuiEvent(this,GuiEvent.CHANGE));
 	}
 	
+	public void selectItemByIndex(int index){
+		selectItem(_itemAry[index] as SelectableItem);
+	}
+	
 	public void unselectItem(){
 		if(_selectedItem!=null){
 			_selectedItem.unselect();

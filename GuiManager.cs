@@ -38,6 +38,24 @@ public class GuiManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		NanoTween.update();
+		//touch event
+		
+		foreach(Touch touch in Input.touches)
+    	{
+			Debug.Log(touch.position);
+			if (touch.phase == TouchPhase.Began){
+				recursionTouchHitTest(_stage,TouchEvent.TOUCH_BEGAN,touch);
+			}else if(touch.phase == TouchPhase.Moved){
+				recursionTouchHitTest(_stage,TouchEvent.TOUCH_MOVED,touch);
+			}else if(touch.phase == TouchPhase.Ended){
+				recursionTouchHitTest(_stage,TouchEvent.TOUCH_ENDED,touch);
+			}else if(touch.phase == TouchPhase.Canceled){
+				recursionTouchHitTest(_stage,TouchEvent.TOUCH_CANCELED,touch);
+			}else if(touch.phase == TouchPhase.Stationary){
+				recursionTouchHitTest(_stage,TouchEvent.TOUCH_STATIONARY,touch);
+			}
+			
+		}
 	}
 	
 	void OnGUI(){
@@ -53,13 +71,16 @@ public class GuiManager : MonoBehaviour {
 		
 		
 		if (Event.current.button == 0 && Event.current.type == EventType.MouseDown) {
+			//Debug.Log("mouse down");
 			recursionHitTest(_stage,MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
 		}
 		
 		
 		if (Event.current.button == 0 && Event.current.type == EventType.MouseUp) {
-			//recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
+			//Debug.Log("mouse up");
+			recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
 		}
+		
 		
 	}
 	
@@ -92,11 +113,45 @@ public class GuiManager : MonoBehaviour {
 			
 			
 			if(isHit){
-				//Debug.Log("hit : "+ MouseEvent.MOUSE_DOWN +"  "+  target.id + "  "+position);
 				target.dispatchEvent(new MouseEvent(target,type,position,new Vector2(position.x-target.transformInTree.tx,position.y-target.transformInTree.ty)));
 			}
 		}
 		return isHit;
 	}
 	
+	
+	
+	
+	bool recursionTouchHitTest(DisplayObject target,string type,Touch touch){
+		
+		//Debug.Log(target.id + "/" + target.boundRect);
+		
+		bool isHit = false;
+		
+		if(target.boundRect.Contains(touch.position)){
+			
+			// if target is sprite ,and texture exist, check if position is hit the rendering rect 
+			if(target is Sprite && (target as Sprite).texture && (target as Sprite).textureRenderRect.Contains(touch.position)){
+				isHit = true;
+			}
+			
+			// go loop the child
+			
+			if(target is DisplayObjectContainer){
+				DisplayObjectContainer	t	= target as DisplayObjectContainer;
+				for(int i=t.childList.Count-1;i>=0;i--){
+					if(recursionTouchHitTest(t.childList[i] as DisplayObject,type,touch)){
+						isHit	= true;
+						break;
+					}
+				}
+			}
+			
+			if(isHit){
+				//Debug.Log(target.id +"/"+type);
+				target.dispatchEvent(new TouchEvent(target,type,touch));
+			}
+		}
+		return isHit;
+	}
 }

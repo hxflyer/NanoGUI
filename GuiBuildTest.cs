@@ -11,7 +11,7 @@ public class GuiBuildTest : MonoBehaviour {
 
 		GuiManager.stage.addChild(img1);
 		
-		/*img1.alpha		= 0.5f;
+		img1.alpha		= 0.5f;
 		img1.x			= 350.0f;
 		img1.scaleX		= 0.5f;
 		img1.id			= "img1";
@@ -25,9 +25,14 @@ public class GuiBuildTest : MonoBehaviour {
 		img2.alpha		= 0.5f;
 		img2.id			= "img2";
 		img2.addEventListner(MouseEvent.MOUSE_DOWN,
-		                     new EventDispatcher.CallBack(img2MouseDown));*/
+		                     new EventDispatcher.CallBack(img2MouseDown));
 		
-		
+		img2.addEventListner(TouchEvent.TOUCH_BEGAN,
+		                     new EventDispatcher.CallBack(img2TouchBegan));
+		img2.addEventListner(TouchEvent.TOUCH_ENDED,
+		                     new EventDispatcher.CallBack(img2TouchEnd));
+		img2.addEventListner(TouchEvent.TOUCH_MOVED,
+		                     new EventDispatcher.CallBack(img2TouchMove));
 	}
 	
 	
@@ -43,8 +48,15 @@ public class GuiBuildTest : MonoBehaviour {
                              "onUpdate",new NanoTween.CallBack(imgUpdate),
                              "onUpdateParams",NanoTween.Pack(e.target)));
 	}
-	
-	
+	void img2TouchBegan(GuiEvent e){
+		Debug.Log("img2TouchBegan");
+	}
+	void img2TouchEnd(GuiEvent e){
+		Debug.Log("img2TouchEnd");
+	}
+	void img2TouchMove(GuiEvent e){
+		Debug.Log("img2TouchMove");
+	}
 	void imgComplete(object[] args){
 		Debug.Log("complete");
 	}

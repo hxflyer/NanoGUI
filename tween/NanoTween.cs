@@ -82,7 +82,7 @@ public class NanoTween : EventDispatcher {
 		_time			= time;
 		_easeFunction	= _ease.defaultEasingFunction;
 		
-		_id				= _tweenCount;
+		id				= _tweenCount.ToString();
 		
 		_currentTime	= 0.0f;
 		_startTime		= Time.time;
@@ -156,10 +156,7 @@ public class NanoTween : EventDispatcher {
 	private ArrayList _endArgs;
 	private ArrayList _argsName;
 	
-	private uint _id;
-	public uint id{
-		get {return _id;}
-	}
+	
 	
 	//call backs
 	private CallBack _onCompleteCallBack;
