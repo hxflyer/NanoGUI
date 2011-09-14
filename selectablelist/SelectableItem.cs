@@ -4,6 +4,11 @@ using System.Collections;
 public class SelectableItem :Sprite {
 
 	// Use this for initialization
+	
+	public SelectableItem (Texture2D texture):base(texture){
+		
+	}
+	
 	public SelectableItem () {
 	
 	}
@@ -11,7 +16,9 @@ public class SelectableItem :Sprite {
 	public int listIndex	= -1;
 	public SelectableList parentList;
 	private bool _isSelected	= false;
-	
+	public bool isSelected{
+		get {return _isSelected;}
+	}
 	public void select(){
 		if(_isSelected){
 			return;

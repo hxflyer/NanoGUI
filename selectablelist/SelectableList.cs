@@ -5,6 +5,9 @@ public class SelectableList :SelectableItem {
 
 	protected ArrayList	_itemAry	= new ArrayList();
 	
+	public SelectableList (Texture2D texture):base(texture) {
+		
+	}
 	public SelectableList () {
 	
 	}

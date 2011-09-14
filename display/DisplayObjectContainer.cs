@@ -23,6 +23,12 @@ public class DisplayObjectContainer : DisplayObject {
 	}
 	
 	public void addChild(DisplayObject child){
+		if(_childList.IndexOf(child)!=-1){
+			return;
+		}
+		if(child.parent!=null){
+			child.parent.removeChild(child);
+		}
 		_childList.Add(child);
 		child.parent		= this;
 		setTransformInTreeDirty();
@@ -30,6 +36,12 @@ public class DisplayObjectContainer : DisplayObject {
 	}
 	
 	public void addChildAt(int index, DisplayObject child){
+		if(_childList.IndexOf(child)!=-1){
+			return;
+		}
+		if(child.parent!=null){
+			child.parent.removeChild(child);
+		}
 		_childList.Insert(index,child);
 		child.parent		= this;
 		setTransformInTreeDirty();
@@ -46,6 +58,10 @@ public class DisplayObjectContainer : DisplayObject {
 		_childList.Remove(child);
 		child.parent		= null;
 		setOriginalSizeDirty();
+	}
+	
+	public bool hasChild(DisplayObject child){
+		return(!(_childList.IndexOf(child)==-1));
 	}
 	
 	public void removeAllChildren(){

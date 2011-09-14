@@ -42,7 +42,7 @@ public class GuiManager : MonoBehaviour {
 		
 		foreach(Touch touch in Input.touches)
     	{
-			Debug.Log(touch.position);
+			//Debug.Log(touch.position);
 			if (touch.phase == TouchPhase.Began){
 				recursionTouchHitTest(_stage,TouchEvent.TOUCH_BEGAN,touch);
 			}else if(touch.phase == TouchPhase.Moved){

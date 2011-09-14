@@ -4,40 +4,71 @@ using System.Collections;
 public class GuiBuildTest : MonoBehaviour {
 	
 	
+	private MainMenu _mainmMenu;
+	private SubMenu _subMenu;
+	
+	private ArrayList _pageAry	= new ArrayList();
+	private Page _lastPage;
 	
 	void Start () {
 
 		Texture2D texture = Resources.Load("testimg",typeof(Texture2D)) as Texture2D;
 		
-		MainMenu menu	= new MainMenu();
-		GuiManager.stage.addChild(menu);
+		_mainmMenu	= new MainMenu();
+		GuiManager.stage.addChild(_mainmMenu);
+		_mainmMenu.y= 685;
+		_mainmMenu.addEventListner(GuiEvent.CHANGE,new EventDispatcher.CallBack(mainMenuChangeHandler));
 		
-		/*Sprite img1	= new Sprite(texture);
+		_subMenu	= new SubMenu();
+		GuiManager.stage.addChildAt(0,_subMenu);
+		_subMenu.y	= 685;
+		_subMenu.addEventListner(GuiEvent.CHANGE,new EventDispatcher.CallBack(subMenuChangeHandler));
+		
+		//hard code 3 pages
+		InteractImagePage page1	= new InteractImagePage(Resources.Load("page/compare",typeof(Texture2D)) as Texture2D);
+		InteractImagePage page2	= new InteractImagePage(Resources.Load("page/time_bg",typeof(Texture2D)) as Texture2D);
+		InteractImagePage page3	= new InteractImagePage(Resources.Load("page/contentPage_bg",typeof(Texture2D)) as Texture2D);
+		page3.buildHardCodeItem();
+		_pageAry.Add(page1);
+		_pageAry.Add(page2);
+		_pageAry.Add(page3);
+	}
+	
+	void mainMenuChangeHandler(GuiEvent e){
+		Debug.Log("menu changed");
+		if(_mainmMenu.selectedItem!=null && _mainmMenu.selectedItem.listIndex==1){
+			NanoTween.to(_subMenu,0.3f,NanoTween.Pack("y",643f,"ease",Ease.easeOutExpo));
+		}else{
+			_subMenu.unselectItem();
+			NanoTween.to(_subMenu,0.3f,NanoTween.Pack("y",685f,"ease",Ease.easeOutExpo));
+			hidePage();
+		}
+	}
+	
+	void subMenuChangeHandler(GuiEvent e){
+		Debug.Log("sub menu changed");
+		if(_lastPage!=null){
+			_lastPage.hide();
+		}
 
-		GuiManager.stage.addChild(img1);
+		if(_subMenu.selectedItem!=null){
+			if(_lastPage==null){
+				Debug.Log(GameObject.Find("Code").GetComponent("SceneScript"));
+				(GameObject.Find("Code").GetComponent("SceneScript") as SceneScript).hideScene();
+			}
+			_lastPage	= _pageAry[_subMenu.selectedItem.listIndex] as Page;
+			_lastPage.show();
+			
+		}
 		
-		
-		img1.x			= 0.0f;
-		img1.y			= 0.5f;
-		img1.id			= "img1";
-		
-		Sprite img2		= new Sprite(texture);
-
-		img1.addChild(img2);
-		img2.y			= 150.0f;
-		img2.scaleX		= 0.5f;
-		img2.scaleY		= 0.5f;
-		img2.alpha		= 0.5f;
-		img2.id			= "img2";
-		img2.addEventListner(MouseEvent.MOUSE_DOWN,
-		                     new EventDispatcher.CallBack(img2MouseDown));
-		
-		img2.addEventListner(TouchEvent.TOUCH_BEGAN,
-		                     new EventDispatcher.CallBack(img2TouchBegan));
-		img2.addEventListner(TouchEvent.TOUCH_ENDED,
-		                     new EventDispatcher.CallBack(img2TouchEnd));
-		img2.addEventListner(TouchEvent.TOUCH_MOVED,
-		                     new EventDispatcher.CallBack(img2TouchMove));*/
+	}
+	
+	void hidePage(){
+		if(_lastPage!=null){
+			_lastPage.hide();
+			_lastPage= null;
+		}
+		(GameObject.Find("Code").GetComponent("SceneScript") as SceneScript).showScene();
 	}
 	
 	
@@ -53,6 +84,9 @@ public class GuiBuildTest : MonoBehaviour {
                              "onUpdate",new NanoTween.CallBack(imgUpdate),
                              "onUpdateParams",NanoTween.Pack(e.target)));
 	}
+	
+	
+	
 	void img2TouchBegan(GuiEvent e){
 		Debug.Log("img2TouchBegan");
 	}
@@ -67,7 +101,6 @@ public class GuiBuildTest : MonoBehaviour {
 	}
 	void imgStart(object[] args){
 		Debug.Log("start");
-		
 	}
 	void imgUpdate(object[] args){
 		Debug.Log("update");	

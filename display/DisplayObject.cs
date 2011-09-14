@@ -286,7 +286,9 @@ public class DisplayObject : EventDispatcher {
 	
 	public DisplayObjectContainer parent {
     	get { return _parent; }
-    	set { _parent = value;}
+    	set { 
+			_parent = value;
+			}
 	}
 	
 	
