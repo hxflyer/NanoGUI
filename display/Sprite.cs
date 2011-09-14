@@ -108,9 +108,10 @@ public class Sprite : DisplayObjectContainer {
 		if(_texture){
 			minChildPos		= new Vector2(0,0);
 			_originalWidth	= _texture.width;
+			_originalHeight	= _texture.height;
 		}else{
 			
-			_originalHeight	= _texture.height;minChildPos		= new Vector2(999999,999999);
+			minChildPos		= new Vector2(999999,999999);
 			_originalWidth	= 0;
 			_originalHeight	= 0;
 		}

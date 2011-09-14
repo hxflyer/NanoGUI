@@ -9,7 +9,7 @@ public class SelectableList :SelectableItem {
 	
 	}
 	
-	public void addItem(SelectableItem item){
+	public virtual void addItem(SelectableItem item){
 		item.listIndex	= _itemAry.Count;
 		item.parentList	= this;
 		_itemAry.Add(item);

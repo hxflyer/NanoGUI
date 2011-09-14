@@ -2,18 +2,23 @@ using UnityEngine;
 using System.Collections;
 
 public class GuiBuildTest : MonoBehaviour {
-
+	
+	
+	
 	void Start () {
 
 		Texture2D texture = Resources.Load("testimg",typeof(Texture2D)) as Texture2D;
 		
-		Sprite img1	= new Sprite(texture);
+		MainMenu menu	= new MainMenu();
+		GuiManager.stage.addChild(menu);
+		
+		/*Sprite img1	= new Sprite(texture);
 
 		GuiManager.stage.addChild(img1);
 		
-		img1.alpha		= 0.5f;
-		img1.x			= 350.0f;
-		img1.scaleX		= 0.5f;
+		
+		img1.x			= 0.0f;
+		img1.y			= 0.5f;
 		img1.id			= "img1";
 		
 		Sprite img2		= new Sprite(texture);
@@ -32,7 +37,7 @@ public class GuiBuildTest : MonoBehaviour {
 		img2.addEventListner(TouchEvent.TOUCH_ENDED,
 		                     new EventDispatcher.CallBack(img2TouchEnd));
 		img2.addEventListner(TouchEvent.TOUCH_MOVED,
-		                     new EventDispatcher.CallBack(img2TouchMove));
+		                     new EventDispatcher.CallBack(img2TouchMove));*/
 	}
 	
 	
