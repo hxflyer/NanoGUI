@@ -41,6 +41,7 @@ public class GuiManager : MonoBehaviour {
 		NanoTween.update();
 		//touch event
 		_stage.sotreTouches(Input.touches);
+		
 		if(Input.touches.Length==1){
 			_stage.sotreMousePosition(Input.touches[0].position);
 		}
@@ -71,8 +72,8 @@ public class GuiManager : MonoBehaviour {
 		stage.render();
 
 		//mouse event
-		
-		_stage.cleanMousePosition();
+		Debug.Log(Event.current.type);
+		//_stage.cleanMousePosition();
 		if (Event.current.button == 0 ){
 			if(Event.current.type == EventType.MouseMove) {
 				

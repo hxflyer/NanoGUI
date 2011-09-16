@@ -16,12 +16,16 @@ public class GuiBuildTest : MonoBehaviour {
 		s1.x	= 100;
 		s1.y	= 100;
 		s.texture	= Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;
+		s.addEventListner(GuiEvent.ENTER_FRAME,new EventDispatcher.CallBack(enterFrameHandler));
 	}
 	
+	void enterFrameHandler(GuiEvent e){
+		Debug.Log(Stage.instance.mouseX+"/"+Stage.instance.mouseY);
+	}
 	// Update is called once per frame
 	void Update () {
 		
-		//Debug.Log(Stage.instance.mouseX+"/"+Stage.instance.mouseY);
+		
 		//bigimg.rotation++;
 	}
  
