@@ -12,6 +12,7 @@ public class GuiManager : MonoBehaviour {
 	private static GuiManager _instance;
 	
 	public static GuiManager instance {
+		
     	get { return _instance; }
     	private set { _instance = value;}
 	}
@@ -72,18 +73,31 @@ public class GuiManager : MonoBehaviour {
 		//mouse event
 		
 		_stage.cleanMousePosition();
-		
-		if (Event.current.button == 0 && Event.current.type == EventType.MouseDown) {
-			//Debug.Log("mouse down");
+		if (Event.current.button == 0 ){
+			if(Event.current.type == EventType.MouseMove) {
+				
+				_stage.sotreMousePosition(Event.current.mousePosition);
+				
+			}else if (Event.current.type == EventType.MouseDrag) {
+				
 			_stage.sotreMousePosition(Event.current.mousePosition);
-			recursionHitTest(_stage,MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
-		}
+				
+			}else if (Event.current.type == EventType.MouseDown) {
+				
+				_stage.sotreMousePosition(Event.current.mousePosition);
+				recursionHitTest(_stage,MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
+				
+			}else if (Event.current.type == EventType.MouseUp) {
 
-		if (Event.current.button == 0 && Event.current.type == EventType.MouseUp) {
-			//Debug.Log("mouse up");
-			_stage.sotreMousePosition(Event.current.mousePosition);
-			recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
+				_stage.sotreMousePosition(Event.current.mousePosition);
+				recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
+				
+			}
 		}
+		
+		
+
+		
 		
 		
 	}

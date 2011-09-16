@@ -19,7 +19,7 @@ public class Sprite : DisplayObjectContainer {
 	protected Texture _texture;
 	public Texture texture {
     	get { return _texture; }
-    	private set { _texture = value;
+    	set { _texture = value;
 			setOriginalSizeDirty();}
 	}
 	
@@ -93,6 +93,8 @@ public class Sprite : DisplayObjectContainer {
 		_boundRect.y		= minChildPos.x * _transformInTreeScale.y + _transformInTree.ty;
 		_boundRect.width	= _originalWidth * _transformInTreeScale.x;
 		_boundRect.height	= _originalHeight * _transformInTreeScale.y;
+		_width				= _boundRect.width;
+		_height				= _boundRect.height;
 	}
 	
 	/***************************************
