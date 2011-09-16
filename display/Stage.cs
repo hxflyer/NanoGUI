@@ -7,6 +7,7 @@ public class Stage : DisplayObjectContainer {
 	
 	private static Stage _instance;
 	public static Stage instance {
+		
     	get { return _instance; }
     	private set { _instance = value;}
 	}
@@ -36,8 +37,62 @@ public class Stage : DisplayObjectContainer {
 		}
 	}
 	
-	public int stageWidth	= Screen.width;
-	public int stageHeight	= Screen.height;
+	
+	
+	
+	/********************************
+	 * touchs and mouse positions
+	 *******************************/
+	
+	private ArrayList _touchAry	= new ArrayList();
+	
+	public ArrayList touchAry{
+		get {return _touchAry;}
+	}
+	
+	public void sotreTouches(Touch[] touchs){
+		
+		if(_touchAry!=null && _touchAry.Count>0){
+			_touchAry.Clear();
+		}
+		if(touchs.Length>0){
+			_touchAry	= ArrayList.Adapter(touchs);
+		}
+	}
+	
+	
+	private int _mouseX = 0;
+	public int mouseX{
+		get {return _mouseX;}
+	}
+	private int _mouseY = 0;
+	public int mouseY{
+		get {return _mouseY;}
+	}
+	public void sotreMousePosition(Vector2 mousePos){
+		_mouseX	= (int)mousePos.x;
+		_mouseY	= (int)mousePos.y;
+	}
+	public void cleanMousePosition(){
+		_mouseX	= 0;
+		_mouseY	= 0;
+	}
+	
+	/********************************
+	 * stage size
+	 *******************************/
+	
+	private int _stageWidth		= Screen.width;
+	public int stageWidth{
+		get{return _stageWidth;}
+	}
+	
+	private int _stageHeight	= Screen.height;
+	public int stageHeight{
+		get{return _stageHeight;}
+	}
+	
+	
 	
 	override public void updateOriginalSize(){
 		if(!_isOriginalSizeDirty){

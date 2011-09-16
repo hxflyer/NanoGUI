@@ -18,6 +18,7 @@ public class SelectableList :SelectableItem {
 		_itemAry.Add(item);
 		addChild(item);
 	}
+	
 	public void addItemAt(SelectableItem item,int index){
 		item.listIndex	= index;
 		item.parentList	= this;
@@ -51,6 +52,12 @@ public class SelectableList :SelectableItem {
 		get {return _selectedItem;}
 	}
 	
+	protected SelectableItem _lastSelectedItem;
+	
+	public SelectableItem lastSelectedItem{
+		get {return _lastSelectedItem;}
+	}
+	
 	public void selectItem(SelectableItem item){
 		if(_selectedItem==item){
 			return;
@@ -58,6 +65,7 @@ public class SelectableList :SelectableItem {
 		
 		if(_selectedItem!=null){
 			_selectedItem.unselect();
+			_lastSelectedItem	= _selectedItem;
 		}
 		_selectedItem	= item;
 		_selectedItem.select();

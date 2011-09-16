@@ -39,7 +39,10 @@ public class GuiManager : MonoBehaviour {
 	void Update () {
 		NanoTween.update();
 		//touch event
-		
+		_stage.sotreTouches(Input.touches);
+		if(Input.touches.Length==1){
+			_stage.sotreMousePosition(Input.touches[0].position);
+		}
 		foreach(Touch touch in Input.touches)
     	{
 			//Debug.Log(touch.position);
@@ -65,19 +68,20 @@ public class GuiManager : MonoBehaviour {
 		stage.updateOriginalSize();
 		stage.updateBoundRect();
 		stage.render();
-		
-		
+
 		//mouse event
 		
+		_stage.cleanMousePosition();
 		
 		if (Event.current.button == 0 && Event.current.type == EventType.MouseDown) {
 			//Debug.Log("mouse down");
+			_stage.sotreMousePosition(Event.current.mousePosition);
 			recursionHitTest(_stage,MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
 		}
-		
-		
+
 		if (Event.current.button == 0 && Event.current.type == EventType.MouseUp) {
 			//Debug.Log("mouse up");
+			_stage.sotreMousePosition(Event.current.mousePosition);
 			recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
 		}
 		
@@ -110,8 +114,6 @@ public class GuiManager : MonoBehaviour {
 					}
 				}
 			}
-			
-			
 			if(isHit){
 				target.dispatchEvent(new MouseEvent(target,type,position,new Vector2(position.x-target.transformInTree.tx,position.y-target.transformInTree.ty)));
 			}

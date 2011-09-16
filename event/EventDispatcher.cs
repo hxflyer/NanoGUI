@@ -6,6 +6,9 @@ public class EventDispatcher  {
 	public string id = "";
 	
 	public delegate void CallBack(GuiEvent e);
+	
+	
+	
 	// Use this for initialization
 	public EventDispatcher () {
 

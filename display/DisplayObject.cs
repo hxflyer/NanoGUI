@@ -3,9 +3,7 @@ using System.Collections;
 
 public class DisplayObject : EventDispatcher {
 	
-	// Use this for initialization
-	public DisplayObject self;
-	
+
 	public DisplayObject () {
 
 	}
@@ -223,6 +221,7 @@ public class DisplayObject : EventDispatcher {
 	/***************************************
 	 * bound rect
 	 ***************************************/
+	
 	protected bool	_isBoundRectDirty	= true;
 	public void setBoundRectDirty(){
 		_isBoundRectDirty	= true;
