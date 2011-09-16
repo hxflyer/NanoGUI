@@ -290,6 +290,14 @@ public class DisplayObject : EventDispatcher {
 			}
 	}
 	
+	protected Stage	_stage;
+	
+	public Stage stage {
+    	get { return _stage; }
+    	set { 
+			_stage = value;
+			}
+	}
 	
 	/***************************************
 	 * hit test

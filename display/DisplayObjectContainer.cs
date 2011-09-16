@@ -22,7 +22,7 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 	}
 	
-	public void addChild(DisplayObject child){
+	public virtual void addChild(DisplayObject child){
 		if(_childList.IndexOf(child)!=-1){
 			return;
 		}
@@ -31,11 +31,12 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 		_childList.Add(child);
 		child.parent		= this;
+		child.stage			= _stage;
 		setTransformInTreeDirty();
 		setOriginalSizeDirty();
 	}
 	
-	public void addChildAt(int index, DisplayObject child){
+	public virtual void addChildAt(int index, DisplayObject child){
 		if(_childList.IndexOf(child)!=-1){
 			return;
 		}
@@ -44,6 +45,7 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 		_childList.Insert(index,child);
 		child.parent		= this;
+		child.stage			= _stage;
 		setTransformInTreeDirty();
 		setOriginalSizeDirty();
 	}
@@ -57,6 +59,7 @@ public class DisplayObjectContainer : DisplayObject {
 		
 		_childList.Remove(child);
 		child.parent		= null;
+		child.stage			= null;
 		setOriginalSizeDirty();
 	}
 	
@@ -68,6 +71,7 @@ public class DisplayObjectContainer : DisplayObject {
 		for(int i=0;i<_childList.Count;i++){
 			DisplayObject child = _childList[i] as DisplayObject;
 			child.parent	= null;
+			child.stage		= null;
 		}
 		_childList.RemoveRange(0,_childList.Count);
 		setOriginalSizeDirty();

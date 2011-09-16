@@ -14,6 +14,7 @@ public class Stage : DisplayObjectContainer {
 	
 	public Stage (){
 		_instance	= this;
+		_stage		= this;
 		id		= "stage";
 
 	}
@@ -39,7 +40,33 @@ public class Stage : DisplayObjectContainer {
 	
 	
 	
+	override public void addChild(DisplayObject child){
+		if(_childList.IndexOf(child)!=-1){
+			return;
+		}
+		if(child.parent!=null){
+			child.parent.removeChild(child);
+		}
+		_childList.Add(child);
+		child.parent		= this;
+		child.stage			= this;
+		setTransformInTreeDirty();
+		setOriginalSizeDirty();
+	}
 	
+	override public void addChildAt(int index, DisplayObject child){
+		if(_childList.IndexOf(child)!=-1){
+			return;
+		}
+		if(child.parent!=null){
+			child.parent.removeChild(child);
+		}
+		_childList.Insert(index,child);
+		child.parent		= this;
+		child.stage			= this;
+		setTransformInTreeDirty();
+		setOriginalSizeDirty();
+	}
 	/********************************
 	 * touchs and mouse positions
 	 *******************************/
