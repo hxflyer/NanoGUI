@@ -9,8 +9,14 @@ public class DisplayObject : EventDispatcher {
 	}
 	
 	
+	// tag: used for storing any variable
+	public object tag;
 	
 	
+	public virtual void destroy(){
+		removeAllChildren();
+		parent.removeChild(this);
+	}
 	
 	/***************************************
 	 * 2d transform
