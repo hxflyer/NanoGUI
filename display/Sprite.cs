@@ -62,9 +62,7 @@ public class Sprite : DisplayObjectContainer {
 			//Debug.Log(id+" : "+_transformInTreeRotation);
 			GUI.DrawTexture(_textureRenderRect,_texture);
 			GUIUtility.RotateAroundPivot (-_transformInTreeRotation, _texturRenderRotatePivot);
-			GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
-			
-			Debug.Log(_boundRectInTree);
+			//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		}
 		//Debug.Log("render:"+id+"  rect:"+_textureRenderRect);
 		renderChildren();
@@ -81,37 +79,41 @@ public class Sprite : DisplayObjectContainer {
 			return;
 		}
 		_isBoundRectDirty	= false;
+		
 		Vector2 minPos = new Vector2();
 		Vector2 maxPos = new Vector2();
-		if(_texture){
-			maxPos.x	= _texture.width;
-			maxPos.y	= _texture.height;
+		
+		
+		if(_texture!=null){
+			
+			Rect textureRect	= _transform.getBoundRect(_textureSelfRect);
+			minPos.x	= textureRect.x;
+			minPos.y	= textureRect.y;
+			maxPos.x	= textureRect.width+textureRect.x;
+			maxPos.y	= textureRect.height+textureRect.y;
 		}else{
 			minPos.x	= 999999;
 			minPos.y	= 999999;
 			maxPos.x	= -999999;
 			maxPos.y	= -999999;
 		}
-		
-		
 		// loop though children to get the bound area of children
 		
-		DisplayObject child;
 		
-		for(int i=0;i<_childList.Count;i++){
-			child	= _childList[i] as DisplayObject;
+		foreach(DisplayObject child in _childList){
 			
-			if(child.boundRect.x<minPos.x){
-				minPos.x	= child.boundRect.x;
+			Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
+			if(childBoundRect.x < minPos.x){
+				minPos.x	= childBoundRect.x;
 			}
-			if(child.boundRect.x+child.boundRect.width>maxPos.x){
-				maxPos.x	= child.boundRect.x+child.boundRect.width;
+			if(childBoundRect.x+childBoundRect.width > maxPos.x){
+				maxPos.x	= childBoundRect.x+childBoundRect.width;
 			}
-			if(child.boundRect.y<minPos.y){
-				minPos.y	= child.boundRect.y;
+			if(childBoundRect.y < minPos.y){
+				minPos.y	= childBoundRect.y;
 			}
-			if(child.boundRect.y+child.boundRect.height>maxPos.y){
-				maxPos.y	= child.boundRect.y+child.boundRect.height;
+			if(childBoundRect.y+childBoundRect.height > maxPos.y){
+				maxPos.y	= childBoundRect.y+childBoundRect.height;
 			}
 		}
 		
@@ -119,20 +121,20 @@ public class Sprite : DisplayObjectContainer {
 		_originalHeight			= maxPos.y-minPos.y;
 		
 		
-		_selfBoundRect.x		= minPos.x;
-		_selfBoundRect.y		= minPos.y;
-
-		_selfBoundRect.width	= _originalWidth;
-		_selfBoundRect.height	= _originalHeight;
-		
 		// get boundRect, boundRect is related with it's parent
-		_boundRect				= _transform.getBoundRect(minPos,maxPos);
-		_boundRectInRree		= _transformInTree.getBoundRect(minPos,maxPos);
+		_boundRect.x			= minPos.x;
+		_boundRect.y			= minPos.y;
+		_boundRect.width		= maxPos.x-minPos.x;
+		_boundRect.height		= maxPos.y-minPos.y;
 		_width					= _boundRect.width;
 		_height					= _boundRect.height;
+		//Debug.Log(id+_boundRect);
+		if(_parent!=null){
+			_boundRectInTree		= _parent.transformInTree.getBoundRect(minPos,maxPos);
+		}
 		//Debug.Log(id+"/"+_boundRectInRree);
 	}
-	protected Rect _boundRectInTree  = new Rect();
+
 	
 	
 	
@@ -142,7 +144,7 @@ public class Sprite : DisplayObjectContainer {
 	override public bool hittest(Vector2 vec){
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		//Debug.Log(newVec);
-		if(!_selfBoundRect.Contains(newVec)){
+		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		if(_texture && _textureRenderRect.Contains(newVec)){
@@ -163,8 +165,8 @@ public class Sprite : DisplayObjectContainer {
 	
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
-		Debug.Log(id+"/"+ newVec + _selfBoundRect+_textureSelfRect);
-		if(!_selfBoundRect.Contains(newVec)){
+		//Debug.Log(id+"/"+ newVec + _selfBoundRect+_textureSelfRect);
+		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;
@@ -182,7 +184,7 @@ public class Sprite : DisplayObjectContainer {
 			
 		}
 		if(isHit){
-			Debug.Log(id+"/"+type);
+			//Debug.Log(id+"/"+type);
 			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
 		}
 		return isHit;
@@ -192,7 +194,7 @@ public class Sprite : DisplayObjectContainer {
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		
-		if(!_selfBoundRect.Contains(newVec)){
+		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;

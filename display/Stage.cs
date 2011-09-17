@@ -18,7 +18,15 @@ public class Stage : DisplayObjectContainer {
 		id		= "stage";
 
 	}
-	
+	private bool _isFirstUpdateComplete	=false;
+	public bool isFirstUpdateComplete{
+		get { return _isFirstUpdateComplete;}
+	}
+	public override void updateTransform ()
+	{
+		_isFirstUpdateComplete	= true;
+		base.updateTransform ();
+	}
 	override public void render(){
 		//GUI.DrawTexture(_boundRectInRree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		
@@ -29,6 +37,7 @@ public class Stage : DisplayObjectContainer {
 	override public void updateTransformInTree(){
 		
 		if(_isTransformInTreeDirty){
+			_isTransformInTreeDirty	= false;
 			_transformInTree		= _transform;
 			_transformInTreeScale	= new Vector2(1,1);
 			setBoundRectDirty();
@@ -142,38 +151,52 @@ public class Stage : DisplayObjectContainer {
 	
 	
 	
-	/*override public void updateOriginalSize(){
-		if(!_isOriginalSizeDirty){
+	override public void updateBoundRect(){
+
+		for(int i=0;i<_childList.Count;i++){
+			(_childList[i] as DisplayObject).updateBoundRect();
+		}
+		if(!_isBoundRectDirty){
 			return;
 		}
-		_originalWidth	= 0;
-		_originalHeight	= 0;
-		Vector2	minChildPos	= new Vector2(999999,999999);
+		_isBoundRectDirty	= false;
+		Vector2 minPos	= new Vector2(999999,999999);
+		Vector2 maxPos	= new Vector2(-999999,-999999);
 		
-		DisplayObject child;
-		for(int i=0;i<_childList.Count;i++){
-			child	= _childList[i] as DisplayObject;
+		
+		// loop though children to get the bound area of children
+		
+		foreach(DisplayObject child in _childList){
 			
-			child.updateOriginalSize();
-			if(child.x+child.width>_originalWidth){
-				_originalWidth	= child.x+child.width;
+			Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
+			if(childBoundRect.x < minPos.x){
+				minPos.x	= childBoundRect.x;
 			}
-			if(child.y+child.height>_originalHeight){
-				_originalHeight	= child.y+child.height;
+			if(childBoundRect.x+childBoundRect.width > maxPos.x){
+				maxPos.x	= childBoundRect.x+childBoundRect.width;
 			}
-			if(child.x<minChildPos.x){
-				minChildPos.x	= child.x;
+			if(childBoundRect.y < minPos.y){
+				minPos.y	= childBoundRect.y;
 			}
-			if(child.y<minChildPos.y){
-				minChildPos.y	= child.y;
+			if(childBoundRect.y+childBoundRect.height > maxPos.y){
+				maxPos.y	= childBoundRect.y+childBoundRect.height;
 			}
 		}
 		
-		_originalWidth	-= minChildPos.x;
-		_originalHeight	-= minChildPos.y;
-		_width	= _originalWidth *_scaleX;
-		_height	= _originalHeight *_scaleY;
+		_originalWidth			= maxPos.x-minPos.x;
+		_originalHeight			= maxPos.y-minPos.y;
 		
-		setBoundRectDirty();
-	}*/
+		
+		// get boundRect, boundRect is related with it's parent
+		_boundRect.x			= minPos.x;
+		_boundRect.y			= minPos.y;
+		_boundRect.width		= maxPos.x-minPos.x;
+		_boundRect.height		= maxPos.y-minPos.y;
+		_width					= _boundRect.width;
+		_height					= _boundRect.height;
+		
+		
+		_boundRectInTree	= _boundRect;
+		
+	}
 }

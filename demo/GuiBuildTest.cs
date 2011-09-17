@@ -14,9 +14,17 @@ public class GuiBuildTest : MonoBehaviour {
 		Texture2D texture2 = Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;
 		s1	= new Sprite(texture2);
 		s.addChild(s1);
+		s.scaleX	= .3f;
+		s.scaleY	= .3f;
 		s1.x	= 100;
 		s1.y	= 100;
 		s1.id	= "s1";
+		s2	= new Sprite(texture2);
+		s1.addChild(s2);
+		s2.x	= 200;
+		s2.y	= 400;
+		s2.id	= "s2";
+		
 		//s.scaleX	= .5f;
 		//s.scaleY	= .5f;
 		//s.texture	= Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;

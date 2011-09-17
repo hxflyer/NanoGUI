@@ -223,6 +223,9 @@ public class DisplayObject : EventDispatcher {
 	protected bool	_isBoundRectDirty	= true;
 	public void setBoundRectDirty(){
 		_isBoundRectDirty	= true;
+		if(_parent!=null){
+			_parent.setBoundRectDirty();
+		}
 	}
 	
 	protected Rect _boundRect	= new Rect();
@@ -304,7 +307,7 @@ public class DisplayObject : EventDispatcher {
 	public DisplayObjectContainer parent {
     	get { return _parent; }
     	set { 
-			_parent = value;
+				_parent = value;
 			}
 	}
 	
@@ -313,7 +316,7 @@ public class DisplayObject : EventDispatcher {
 	public Stage stage {
     	get { return _stage; }
     	set { 
-			_stage = value;
+				_stage = value;
 			}
 	}
 	

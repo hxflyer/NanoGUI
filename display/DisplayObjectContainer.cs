@@ -125,7 +125,7 @@ public class DisplayObjectContainer : DisplayObject {
 		if(!_visible && _alphaInTree<=0){
 			return;
 		}
-		//GUI.DrawTexture(_boundRectInRree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+		//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		renderChildren();
 	}
 	
@@ -155,41 +155,41 @@ public class DisplayObjectContainer : DisplayObject {
 		
 		// loop though children to get the bound area of children
 		
-		DisplayObject child;
-		
-		for(int i=0;i<_childList.Count;i++){
-			child	= _childList[i] as DisplayObject;
-			if(child.boundRect.x<minPos.x){
-				minPos.x	= child.boundRect.x;
+		foreach(DisplayObject child in _childList){
+			
+			Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
+			if(childBoundRect.x < minPos.x){
+				minPos.x	= childBoundRect.x;
 			}
-			if(child.boundRect.x+child.boundRect.width>maxPos.x){
-				maxPos.x	= child.boundRect.x+child.boundRect.width;
+			if(childBoundRect.x+childBoundRect.width > maxPos.x){
+				maxPos.x	= childBoundRect.x+childBoundRect.width;
 			}
-			if(child.boundRect.y<minPos.y){
-				minPos.y	= child.boundRect.y;
+			if(childBoundRect.y < minPos.y){
+				minPos.y	= childBoundRect.y;
 			}
-			if(child.boundRect.y+child.boundRect.height>maxPos.y){
-				maxPos.y	= child.boundRect.y+child.boundRect.height;
+			if(childBoundRect.y+childBoundRect.height > maxPos.y){
+				maxPos.y	= childBoundRect.y+childBoundRect.height;
 			}
 		}
 		
 		_originalWidth			= maxPos.x-minPos.x;
 		_originalHeight			= maxPos.y-minPos.y;
 		
-		_selfBoundRect.x		= minPos.x;
-		_selfBoundRect.y		= minPos.y;
-
-		_selfBoundRect.width	= _originalWidth;
-		_selfBoundRect.height	= _originalHeight;
 		
 		// get boundRect, boundRect is related with it's parent
-		_boundRect				= _transform.getBoundRect(minPos,maxPos);
-		_boundRectInRree		= _transformInTree.getBoundRect(minPos,maxPos);
-		
+		_boundRect.x			= minPos.x;
+		_boundRect.y			= minPos.y;
+		_boundRect.width		= maxPos.x-minPos.x;
+		_boundRect.height		= maxPos.y-minPos.y;
 		_width					= _boundRect.width;
 		_height					= _boundRect.height;
+		
+		//Debug.Log(id+_boundRect);
+		if(_parent!=null){
+			_boundRectInTree	= _parent.transformInTree.getBoundRect(minPos,maxPos);
+		}
 	}
-	protected Rect _boundRectInRree  = new Rect();
+
 	
 	
 	
@@ -198,7 +198,7 @@ public class DisplayObjectContainer : DisplayObject {
 	 ***************************************/
 	override public bool hittest(Vector2 vec){
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
-		if(!_selfBoundRect.Contains(newVec)){
+		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;
@@ -217,7 +217,7 @@ public class DisplayObjectContainer : DisplayObject {
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 
-		if(!_selfBoundRect.Contains(newVec)){
+		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;
@@ -239,7 +239,7 @@ public class DisplayObjectContainer : DisplayObject {
 	override public bool hitTestTouchDispatch(string type,Touch touch){
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
-		if(!_selfBoundRect.Contains(newVec)){
+		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;
