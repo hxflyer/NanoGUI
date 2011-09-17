@@ -39,9 +39,7 @@ public class GuiManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		NanoTween.update();
-		stage.updateTransform();
-		stage.updateTransformInTree();
-		stage.updateBoundRect();
+		
 		_stage.cleanMousePosition();
 		//touch event
 		_stage.updateTouches(Input.touches);
@@ -69,7 +67,9 @@ public class GuiManager : MonoBehaviour {
 	
 	void OnGUI(){
 		
-		
+		stage.updateTransform();
+		stage.updateTransformInTree();
+		stage.updateBoundRect();
 		stage.render();
 
 		//mouse event
