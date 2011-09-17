@@ -4,9 +4,9 @@ using System.Collections;
 /*
  * Transform2D is a 2d matrix contribute for rotation/translation/scaling
  * component structure:
- *  | a c tx |
- *  | b d ty |
- *  | u v w  |
+ *  | a c tx | x  
+ *  | b d ty | y
+ *  | u v w  | 1
  */
 
 public class Transform2D : Object {
@@ -16,6 +16,28 @@ public class Transform2D : Object {
 	public Transform2D () {
 	
 	}
+	
+	public Transform2D(float a,float b,float c,float d,float tx,float ty,float u,float v,float w){
+		this.a	= a;
+		this.b	= b;
+		this.c	= c;
+		this.d	= d;
+		this.tx	= tx;
+		this.ty	= ty;
+		this.u	= u;
+		this.v	= v;
+		this.w	= w;
+	}
+	
+	public Transform2D(float a,float b,float c,float d,float tx,float ty){
+		this.a	= a;
+		this.b	= b;
+		this.c	= c;
+		this.d	= d;
+		this.tx	= tx;
+		this.ty	= ty;
+	}
+	
 	public DisplayObject target;
 	
 	public float a	= 1.0f;
@@ -55,7 +77,11 @@ public class Transform2D : Object {
 	}
 	
 	
-	
+	public override string ToString ()
+	{
+		
+		return string.Format (a+","+c+","+tx+","+b+","+d+","+ty+","+u+","+c+","+w);
+	}
 	//translation
 	
 	public void translateX(float t){
@@ -124,6 +150,9 @@ public class Transform2D : Object {
 	
 	
 	
+	public Transform2D clone(){
+		return(new Transform2D( a, b, c, d, tx, ty, u, v, w));
+	}
 	
 	/*
 	 * invert
@@ -157,8 +186,92 @@ public class Transform2D : Object {
 		 * 
 		 */ 
 	}
+	public Transform2D getInverted(){
+		Transform2D result = new Transform2D( a, b, c, d, tx, ty);
+		result.invert();
+		return(result);
+	}
 	
+	public Rect getBoundRect(Vector2 minPos,Vector2 maxPos){
+		Rect result	= new Rect();
+		if(maxPos.x-minPos.x<0 || maxPos.y-minPos.y<0){
+			return (result);
+		}
+		Vector2 p1		= transformVector(new Vector2(minPos.x,minPos.y));
+		Vector2 p2		= transformVector(new Vector2(maxPos.x,minPos.y));
+		Vector2 p3		= transformVector(new Vector2(maxPos.x,maxPos.y));
+		Vector2 p4		= transformVector(new Vector2(minPos.x,maxPos.y));
+		
+		Vector2 minPos2 = new Vector2();
+		Vector2 maxPos2 = new Vector2();
+		minPos2.x		= p1.x;
+		if(minPos2.x>p2.x){ minPos2.x	= p2.x; }
+		if(minPos2.x>p3.x){ minPos2.x	= p3.x; }
+		if(minPos2.x>p4.x){ minPos2.x	= p4.x; }
+		minPos2.y		= p1.y;
+		if(minPos2.y>p2.y){ minPos2.y	= p2.y; }
+		if(minPos2.y>p3.y){ minPos2.y	= p3.y; }
+		if(minPos2.y>p4.y){ minPos2.y	= p4.y; }
+		
+		maxPos2.x		= p1.x;
+		if(maxPos2.x<p2.x){ maxPos2.x	= p2.x; }
+		if(maxPos2.x<p3.x){ maxPos2.x	= p3.x; }
+		if(maxPos2.x<p4.x){ maxPos2.x	= p4.x; }
+		maxPos2.y		= p1.y;
+		if(maxPos2.y<p2.y){ maxPos2.y	= p2.y; }
+		if(maxPos2.y<p3.y){ maxPos2.y	= p3.y; }
+		if(maxPos2.y<p4.y){ maxPos2.y	= p4.y; }
+		
+		result.x		= minPos2.x;
+		result.y		= minPos2.y;
+		result.width	= (maxPos2.x-minPos2.x);
+		result.height	= (maxPos2.y-minPos2.y);
+		return (result);
+	}
 	
+	public Rect getBoundRect(Rect rect){
+		Rect result	= new Rect();
+		if(rect.width<0 || rect.height<0){
+			return (result);
+		}
+		Vector2 p1		= transformVector(new Vector2(rect.x,rect.y));
+		Vector2 p2		= transformVector(new Vector2(rect.x+rect.width,rect.y));
+		Vector2 p3		= transformVector(new Vector2(rect.x+rect.width,rect.y+rect.height));
+		Vector2 p4		= transformVector(new Vector2(rect.x,rect.y+rect.height));
+		
+		Vector2 minPos2 = new Vector2();
+		Vector2 maxPos2 = new Vector2();
+		minPos2.x		= p1.x;
+		if(minPos2.x>p2.x){ minPos2.x	= p2.x; }
+		if(minPos2.x>p3.x){ minPos2.x	= p3.x; }
+		if(minPos2.x>p4.x){ minPos2.x	= p4.x; }
+		minPos2.y		= p1.y;
+		if(minPos2.y>p2.y){ minPos2.y	= p2.y; }
+		if(minPos2.y>p3.y){ minPos2.y	= p3.y; }
+		if(minPos2.y>p4.y){ minPos2.y	= p4.y; }
+		
+		maxPos2.x		= p1.x;
+		if(maxPos2.x<p2.x){ maxPos2.x	= p2.x; }
+		if(maxPos2.x<p3.x){ maxPos2.x	= p3.x; }
+		if(maxPos2.x<p4.x){ maxPos2.x	= p4.x; }
+		maxPos2.y		= p1.y;
+		if(maxPos2.y<p2.y){ maxPos2.y	= p2.y; }
+		if(maxPos2.y<p3.y){ maxPos2.y	= p3.y; }
+		if(maxPos2.y<p4.y){ maxPos2.y	= p4.y; }
+		
+		result.x		= minPos2.x;
+		result.y		= minPos2.y;
+		result.width	= (maxPos2.x-minPos2.x);
+		result.height	= (maxPos2.y-minPos2.y);
+		return (result);
+	}
+	
+	//transform vector
+	public Vector2	transformVector(Vector2 vec){
+		Vector2 result	= new Vector2();
+		
+		return(new Vector2(a*vec.x+c*vec.y+tx,b*vec.x+d*vec.y+ty));
+	}
 	
 	//mutiply
 	

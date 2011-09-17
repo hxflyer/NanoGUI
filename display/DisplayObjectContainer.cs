@@ -33,7 +33,7 @@ public class DisplayObjectContainer : DisplayObject {
 		child.parent		= this;
 		child.stage			= _stage;
 		setTransformInTreeDirty();
-		setOriginalSizeDirty();
+		setBoundRectDirty();
 	}
 	
 	public virtual void addChildAt(int index, DisplayObject child){
@@ -47,7 +47,7 @@ public class DisplayObjectContainer : DisplayObject {
 		child.parent		= this;
 		child.stage			= _stage;
 		setTransformInTreeDirty();
-		setOriginalSizeDirty();
+		setBoundRectDirty();
 	}
 	
 	public void setChildIndex(DisplayObject child,int index){
@@ -60,7 +60,7 @@ public class DisplayObjectContainer : DisplayObject {
 		_childList.Remove(child);
 		child.parent		= null;
 		child.stage			= null;
-		setOriginalSizeDirty();
+		setBoundRectDirty();
 	}
 	
 	public bool hasChild(DisplayObject child){
@@ -74,7 +74,7 @@ public class DisplayObjectContainer : DisplayObject {
 			child.stage		= null;
 		}
 		_childList.RemoveRange(0,_childList.Count);
-		setOriginalSizeDirty();
+		setBoundRectDirty();
 	}
 	
 	public int numChildren{
@@ -122,6 +122,7 @@ public class DisplayObjectContainer : DisplayObject {
 		if(!_visible && _alphaInTree<=0){
 			return;
 		}
+		//GUI.DrawTexture(_boundRectInRree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		renderChildren();
 	}
 	
@@ -135,9 +136,9 @@ public class DisplayObjectContainer : DisplayObject {
 	/***************************************
 	 * bound rect
 	 ***************************************/
+	
 	override public void updateBoundRect(){
-		
-		
+
 		for(int i=0;i<_childList.Count;i++){
 			(_childList[i] as DisplayObject).updateBoundRect();
 		}
@@ -145,79 +146,110 @@ public class DisplayObjectContainer : DisplayObject {
 			return;
 		}
 		
-		Vector2	minChildPos	= new Vector2(999999,999999);
+		Vector2 minPos	= new Vector2(999999,999999);
+		Vector2 maxPos	= new Vector2(-999999,-999999);
+		
+		
+		// loop though children to get the bound area of children
+		
 		DisplayObject child;
 		
 		for(int i=0;i<_childList.Count;i++){
 			child	= _childList[i] as DisplayObject;
-			if(child.x<minChildPos.x){
-				minChildPos.x	= child.x;
+			if(child.boundRect.x<minPos.x){
+				minPos.x	= child.boundRect.x;
 			}
-			if(child.y<minChildPos.y){
-				minChildPos.y	= child.y;
+			if(child.boundRect.x+child.boundRect.width>maxPos.x){
+				maxPos.x	= child.boundRect.x+child.boundRect.width;
+			}
+			if(child.boundRect.y<minPos.y){
+				minPos.y	= child.boundRect.y;
+			}
+			if(child.boundRect.y+child.boundRect.height>maxPos.y){
+				maxPos.y	= child.boundRect.y+child.boundRect.height;
 			}
 		}
 		
-		_boundRect.x		= minChildPos.x * _transformInTreeScale.x + _transformInTree.tx;
-		_boundRect.y		= minChildPos.y * _transformInTreeScale.y + _transformInTree.ty;
-		_boundRect.width	= _originalWidth * _transformInTreeScale.x;
-		_boundRect.height	= _originalHeight * _transformInTreeScale.y;
-	}
-	
-	/***************************************
-	 * original size
-	 ***************************************/
-	
-	override public void updateOriginalSize(){
-		if(!_isOriginalSizeDirty){
-			return;
-		}
-		_originalWidth	= 0;
-		_originalHeight	= 0;
-		DisplayObject child;
-		Vector2	minChildPos	= new Vector2(999999,999999);
+		_originalWidth			= maxPos.x-minPos.x;
+		_originalHeight			= maxPos.y-minPos.y;
 		
-		for(int i=0;i<_childList.Count;i++){
-			child	= _childList[i] as DisplayObject;
-			
-			child.updateOriginalSize();
-			if(child.x+child.width>_originalWidth){
-				_originalWidth	= child.x+child.width;
-			}
-			if(child.y+child.height>_originalHeight){
-				_originalHeight	= child.y+child.height;
-			}
-			if(child.x<minChildPos.x){
-				minChildPos.x	= child.x;
-			}
-			if(child.y<minChildPos.y){
-				minChildPos.y	= child.y;
-			}
-		}
-		_originalWidth	-= minChildPos.x;
-		_originalHeight	-= minChildPos.y;
-		_width	= _originalWidth *_scaleX;
-		_height	= _originalHeight *_scaleY;
-		setBoundRectDirty();
+		_selfBoundRect.x		= minPos.x;
+		_selfBoundRect.y		= minPos.y;
+
+		_selfBoundRect.width	= _originalWidth;
+		_selfBoundRect.height	= _originalHeight;
+		
+		// get boundRect, boundRect is related with it's parent
+		_boundRect				= _transform.getBoundRect(minPos,maxPos);
+		_boundRectInRree		= _transformInTree.getBoundRect(minPos,maxPos);
+		
+		
 	}
+	protected Rect _boundRectInRree  = new Rect();
+	
+	
 	
 	/***************************************
 	 * hit test
 	 ***************************************/
-	
-	override public bool hitTest(Vector2 v){
-		if(!_boundRect.Contains(v)){
+	override public bool hittest(Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		if(!_selfBoundRect.Contains(newVec)){
 			return false;
 		}
 		bool isHit = false;
 		DisplayObject child;
 		for(int i=_childList.Count-1;i>=0;i--){
 			child	= _childList[i] as DisplayObject;
-			if(child.hitTest(v)){
+			if(child.hittest(vec)){
 				isHit	= true;
 				break;
 			}
 			
+		}
+		return isHit;
+	}
+	
+	override public bool hitTestMouseDispatch(string type,Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+
+		if(!_selfBoundRect.Contains(newVec)){
+			return false;
+		}
+		bool isHit = false;
+		DisplayObject child;
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hitTestMouseDispatch(type,vec)){
+				isHit	= true;
+				break;
+			}
+			
+		}
+		if(isHit){
+			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
+		}
+		return isHit;
+	}
+	
+	override public bool hitTestTouchDispatch(string type,Touch touch){
+		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		if(!_selfBoundRect.Contains(newVec)){
+			return false;
+		}
+		bool isHit = false;
+		DisplayObject child;
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hitTestTouchDispatch(type,touch)){
+				isHit	= true;
+				break;
+			}
+			
+		}
+		if(isHit){
+			this.dispatchEvent(new TouchEvent(this,type,touch));
 		}
 		return isHit;
 	}

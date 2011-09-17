@@ -39,25 +39,29 @@ public class GuiManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		NanoTween.update();
+		stage.updateTransform();
+		stage.updateTransformInTree();
+		stage.updateBoundRect();
+		_stage.cleanMousePosition();
 		//touch event
-		_stage.sotreTouches(Input.touches);
+		_stage.updateTouches(Input.touches);
 		
 		if(Input.touches.Length==1){
-			_stage.sotreMousePosition(Input.touches[0].position);
+			_stage.updateMousePosition(new Vector2(Input.touches[0].position.x,stage.height-Input.touches[0].position.y),new Vector2(Input.touches[0].deltaPosition.x,-Input.touches[0].deltaPosition.y));
 		}
 		foreach(Touch touch in Input.touches)
     	{
 			//Debug.Log(touch.position);
 			if (touch.phase == TouchPhase.Began){
-				recursionTouchHitTest(_stage,TouchEvent.TOUCH_BEGAN,touch);
+				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_BEGAN,touch);
 			}else if(touch.phase == TouchPhase.Moved){
-				recursionTouchHitTest(_stage,TouchEvent.TOUCH_MOVED,touch);
+				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_MOVED,touch);
 			}else if(touch.phase == TouchPhase.Ended){
-				recursionTouchHitTest(_stage,TouchEvent.TOUCH_ENDED,touch);
+				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_ENDED,touch);
 			}else if(touch.phase == TouchPhase.Canceled){
-				recursionTouchHitTest(_stage,TouchEvent.TOUCH_CANCELED,touch);
+				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_CANCELED,touch);
 			}else if(touch.phase == TouchPhase.Stationary){
-				recursionTouchHitTest(_stage,TouchEvent.TOUCH_STATIONARY,touch);
+				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_STATIONARY,touch);
 			}
 			
 		}
@@ -65,33 +69,29 @@ public class GuiManager : MonoBehaviour {
 	
 	void OnGUI(){
 		
-		stage.updateTransform();
-		stage.updateTransformInTree();
-		stage.updateOriginalSize();
-		stage.updateBoundRect();
+		
 		stage.render();
 
 		//mouse event
-		Debug.Log(Event.current.type);
-		//_stage.cleanMousePosition();
+		
 		if (Event.current.button == 0 ){
 			if(Event.current.type == EventType.MouseMove) {
 				
-				_stage.sotreMousePosition(Event.current.mousePosition);
+				_stage.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				
 			}else if (Event.current.type == EventType.MouseDrag) {
 				
-			_stage.sotreMousePosition(Event.current.mousePosition);
+			_stage.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				
 			}else if (Event.current.type == EventType.MouseDown) {
 				
-				_stage.sotreMousePosition(Event.current.mousePosition);
-				recursionHitTest(_stage,MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
+				_stage.updateMousePosition(Event.current.mousePosition,Event.current.delta);
+				_stage.hitTestMouseDispatch(MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
 				
 			}else if (Event.current.type == EventType.MouseUp) {
 
-				_stage.sotreMousePosition(Event.current.mousePosition);
-				recursionHitTest(_stage,MouseEvent.MOUSE_UP,Event.current.mousePosition);
+				_stage.updateMousePosition(Event.current.mousePosition,Event.current.delta);
+				_stage.hitTestMouseDispatch(MouseEvent.MOUSE_UP,Event.current.mousePosition);
 				
 			}
 		}
@@ -105,7 +105,7 @@ public class GuiManager : MonoBehaviour {
 	
 	
 	
-	bool recursionHitTest(DisplayObject target,string type,Vector2 position){
+	/*bool recursionHitTest(DisplayObject target,string type,Vector2 position){
 		
 		//Debug.Log(target.id + "/" + target.boundRect);
 		
@@ -139,16 +139,16 @@ public class GuiManager : MonoBehaviour {
 	
 	
 	
-	bool recursionTouchHitTest(DisplayObject target,string type,Touch touch){
+	bool hitTestEventDispatch(DisplayObject target,string type,Touch touch){
 		
 		//Debug.Log(target.id + "/" + target.boundRect);
 		
 		bool isHit = false;
 		
-		if(target.boundRect.Contains(touch.position)){
+		if(target.hittest(new Vector2(touch.position.x,stage.height-touch.position.y))){
 			
 			// if target is sprite ,and texture exist, check if position is hit the rendering rect 
-			if(target is Sprite && (target as Sprite).texture && (target as Sprite).textureRenderRect.Contains(touch.position)){
+			if(target is Sprite && (target as Sprite).texture && (target as Sprite).textureRenderRect.Contains(new Vector2(touch.position.x,stage.height-touch.position.y))){
 				isHit = true;
 			}
 			
@@ -170,5 +170,5 @@ public class GuiManager : MonoBehaviour {
 			}
 		}
 		return isHit;
-	}
+	}*/
 }

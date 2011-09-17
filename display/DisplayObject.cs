@@ -24,9 +24,19 @@ public class DisplayObject : EventDispatcher {
 	}
 	
 	protected Transform2D	_transformInTree;
+	
 	public Transform2D transformInTree {
     	get { return _transformInTree; }
     	private set { _transformInTree = value;}
+	}
+	protected Transform2D	_transformInTreeInverted;
+	public Transform2D transformInTreeInverted{
+		get {	
+				if(_transformInTreeInverted==null){
+					_transformInTreeInverted=_transformInTree.getInverted();
+				}
+				return _transformInTreeInverted;
+			}
 	}
 	
 	
@@ -48,7 +58,7 @@ public class DisplayObject : EventDispatcher {
 		
 		setTransformInTreeDirty();
 		if(_parent!=null){
-			_parent.setOriginalSizeDirty();
+			_parent.setBoundRectDirty();
 		}
 	}
 	
@@ -60,9 +70,6 @@ public class DisplayObject : EventDispatcher {
 	public virtual void setTransformInTreeDirty(){
 		_isTransformInTreeDirty	= true;
 	}
-	
-	
-	//transform in tree update
 	
 	protected Vector2 _transformInTreeScale;
 	public Vector2 transformInTreeScale{
@@ -88,7 +95,7 @@ public class DisplayObject : EventDispatcher {
 		_transformInTreeScale.x	= _scaleX*_parent.transformInTreeScale.x;
 		_transformInTreeScale.y	= _scaleY*_parent.transformInTreeScale.y;
 		_transformInTreeRotation	= _rotation + _parent.transformInTreeRotation;
-		
+		_transformInTreeInverted= null;
 		setBoundRectDirty();
 	}
 	
@@ -103,7 +110,7 @@ public class DisplayObject : EventDispatcher {
 			_transform.setTranslateX(_x);
 			setTransformInTreeDirty();
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -116,7 +123,7 @@ public class DisplayObject : EventDispatcher {
 			_transform.setTranslateY(_y);
 			setTransformInTreeDirty();
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -131,7 +138,7 @@ public class DisplayObject : EventDispatcher {
 			}
 			_isTransformDirty	= true;
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -146,7 +153,7 @@ public class DisplayObject : EventDispatcher {
 			}
 			_isTransformDirty	= true;
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -161,7 +168,7 @@ public class DisplayObject : EventDispatcher {
 			}
 			_isTransformDirty	= true;
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -176,7 +183,7 @@ public class DisplayObject : EventDispatcher {
 			}
 			_isTransformDirty	= true;
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -188,7 +195,7 @@ public class DisplayObject : EventDispatcher {
 			_rotation = value;
 			_isTransformDirty	= true;
 			if(_parent!=null){
-				_parent.setOriginalSizeDirty();
+				_parent.setBoundRectDirty();
 			}
 		}
 	}
@@ -202,21 +209,7 @@ public class DisplayObject : EventDispatcher {
 	
 	protected float _originalWidth	= 0;
 	protected float _originalHeight	= 0;
-	protected bool _isOriginalSizeDirty = true;
 	
-	public virtual void updateOriginalSize(){
-		
-	}
-	
-	public void setOriginalSizeDirty(){
-		if(!_isOriginalSizeDirty){
-			return;
-		}
-		_isOriginalSizeDirty	= true;
-		if(_parent!=null){
-			_parent.setOriginalSizeDirty();
-		}
-	}
 	
 	/***************************************
 	 * bound rect
@@ -226,6 +219,7 @@ public class DisplayObject : EventDispatcher {
 	public void setBoundRectDirty(){
 		_isBoundRectDirty	= true;
 	}
+	
 	protected Rect _boundRect	= new Rect();
 	
 	public Rect boundRect {
@@ -233,14 +227,32 @@ public class DisplayObject : EventDispatcher {
     	private set { _boundRect = value;}
 	}
 	
+	protected Rect _boundRectInTree  = new Rect();
+	
+	public Rect boundRectInTree {
+    	get { return _boundRectInTree; }
+    	private set { _boundRectInTree = value;}
+	}
+	
+	protected Rect _selfBoundRect	= new Rect();
+	
+	public Rect selfBoundRect {
+    	get { return _selfBoundRect; }
+    	private set { _selfBoundRect = value;}
+	}
+	
 	public virtual void updateBoundRect(){
 		if(!_isBoundRectDirty){
 			return;
 		}
-		_boundRect.x		= _transformInTree.tx;
-		_boundRect.y		= _transformInTree.ty;
-		_boundRect.width	= _originalWidth * _transformInTreeScale.x;
-		_boundRect.height	= _originalHeight * _transformInTreeScale.y;
+		_selfBoundRect.x	= 0;
+		_selfBoundRect.y	= 0;
+		_selfBoundRect.width= _originalWidth/_scaleX;
+		_selfBoundRect.height=_originalHeight/_scaleY;
+		_boundRect.x		= _x;
+		_boundRect.y		= _y;
+		_boundRect.width	= _width;
+		_boundRect.height	= _height;
 	}
 	
 	
@@ -303,7 +315,36 @@ public class DisplayObject : EventDispatcher {
 	 * hit test
 	 ***************************************/
 	
-	public virtual bool hitTest(Vector2 v){
-		return _boundRect.Contains(v);
+	public virtual bool hittest(Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		return (_selfBoundRect.Contains(vec));
+	}
+	
+	
+	public virtual bool hitTestMouseDispatch(string type,Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		bool isHit	= false;
+		if(!_selfBoundRect.Contains(newVec)){
+			return false;
+		}
+		
+		if(isHit){
+			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
+		}
+		return isHit;
+	}
+	
+	public virtual bool hitTestTouchDispatch(string type,Touch touch){
+		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		bool isHit	= false;
+		if(!_selfBoundRect.Contains(newVec)){
+			return false;
+		}
+		
+		if(isHit){
+			this.dispatchEvent(new TouchEvent(this,type,touch));
+		}
+		return isHit;
 	}
 }

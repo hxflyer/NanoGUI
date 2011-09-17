@@ -8,6 +8,8 @@ public class Sprite : DisplayObjectContainer {
 		_texture	= texture;
 		_originalWidth	= _texture.width;
 		_originalHeight	= _texture.height;
+		_textureSelfRect.width = _texture.width;
+		_textureSelfRect.height= _texture.height;
 	}
 	public Sprite (){
 		
@@ -20,11 +22,16 @@ public class Sprite : DisplayObjectContainer {
 	public Texture texture {
     	get { return _texture; }
     	set { _texture = value;
-			setOriginalSizeDirty();}
+			setBoundRectDirty();
+			_textureSelfRect.width = _texture.width;
+			_textureSelfRect.height= _texture.height;
+			
+		}
 	}
 	
 	protected Rect _textureRenderRect	= new Rect();
 	protected Vector2 _texturRenderRotatePivot	= new Vector2();
+	protected Rect _textureSelfRect		= new Rect();
 	
 	public Rect textureRenderRect {
     	get { return _textureRenderRect; }
@@ -55,6 +62,8 @@ public class Sprite : DisplayObjectContainer {
 			//Debug.Log(id+" : "+_transformInTreeRotation);
 			GUI.DrawTexture(_textureRenderRect,_texture);
 			GUIUtility.RotateAroundPivot (-_transformInTreeRotation, _texturRenderRotatePivot);
+			//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+			
 		}
 		//Debug.Log("render:"+id+"  rect:"+_textureRenderRect);
 		renderChildren();
@@ -71,103 +80,75 @@ public class Sprite : DisplayObjectContainer {
 			return;
 		}
 		
-		Vector2	minChildPos;
+		Vector2 minPos = new Vector2();
+		Vector2 maxPos = new Vector2();
 		if(_texture){
-			minChildPos	= new Vector2(0,0);
+			maxPos.x	= _texture.width;
+			maxPos.y	= _texture.height;
 		}else{
-			minChildPos	= new Vector2(999999,999999);
+			minPos.x	= 999999;
+			minPos.y	= 999999;
+			maxPos.x	= -999999;
+			maxPos.y	= -999999;
 		}
+		
+		
+		// loop though children to get the bound area of children
+		
 		DisplayObject child;
 		
 		for(int i=0;i<_childList.Count;i++){
 			child	= _childList[i] as DisplayObject;
-			if(child.x<minChildPos.x){
-				minChildPos.x	= child.x;
-			}
-			if(child.y<minChildPos.y){
-				minChildPos.y	= child.y;
-			}
-		}
-		
-		_boundRect.x		= minChildPos.x * _transformInTreeScale.x + _transformInTree.tx;
-		_boundRect.y		= minChildPos.x * _transformInTreeScale.y + _transformInTree.ty;
-		_boundRect.width	= _originalWidth * _transformInTreeScale.x;
-		_boundRect.height	= _originalHeight * _transformInTreeScale.y;
-		_width				= _boundRect.width;
-		_height				= _boundRect.height;
-	}
-	
-	/***************************************
-	 * original size
-	 ***************************************/
-	
-	override public void updateOriginalSize(){
-		if(!_isOriginalSizeDirty){
-			return;
-		}
-		//Debug.Log("updateOriginalSize:"+id);
-		Vector2	minChildPos;
-		if(_texture){
-			minChildPos		= new Vector2(0,0);
-			_originalWidth	= _texture.width;
-			_originalHeight	= _texture.height;
-		}else{
 			
-			minChildPos		= new Vector2(999999,999999);
-			_originalWidth	= 0;
-			_originalHeight	= 0;
-		}
-		DisplayObject child;
-		for(int i=0;i<_childList.Count;i++){
-			child	= _childList[i] as DisplayObject;
-			child.updateOriginalSize();
-			if(child.x+child.width>_originalWidth){
-				_originalWidth	= child.x+child.width;
+			if(child.boundRect.x<minPos.x){
+				minPos.x	= child.boundRect.x;
 			}
-			if(child.y+child.height>_originalHeight){
-				_originalHeight	= child.y+child.height;
+			if(child.boundRect.x+child.boundRect.width>maxPos.x){
+				maxPos.x	= child.boundRect.x+child.boundRect.width;
 			}
-			if(child.x<minChildPos.x){
-				minChildPos.x	= child.x;
+			if(child.boundRect.y<minPos.y){
+				minPos.y	= child.boundRect.y;
 			}
-			if(child.y<minChildPos.y){
-				minChildPos.y	= child.y;
+			if(child.boundRect.y+child.boundRect.height>maxPos.y){
+				maxPos.y	= child.boundRect.y+child.boundRect.height;
 			}
 		}
 		
-		if(_texture){
-			if(minChildPos.x<0){
-				_originalWidth	-= minChildPos.x;
-			}
-			if(minChildPos.y<0){
-				_originalHeight	-= minChildPos.y;
-			}
-		}else{
-			_originalWidth	-= minChildPos.x;
-			_originalHeight	-= minChildPos.y;
-		}
-		_width	= _originalWidth *_scaleX;
-		_height	= _originalHeight *_scaleY;
-		setBoundRectDirty();
+		_originalWidth			= maxPos.x-minPos.x;
+		_originalHeight			= maxPos.y-minPos.y;
+		
+		_selfBoundRect.x		= minPos.x;
+		_selfBoundRect.y		= minPos.y;
+
+		_selfBoundRect.width	= _originalWidth;
+		_selfBoundRect.height	= _originalHeight;
+		
+		// get boundRect, boundRect is related with it's parent
+		_boundRect				= _transform.getBoundRect(minPos,maxPos);
+		_boundRectInRree		= _transformInTree.getBoundRect(minPos,maxPos);
+		//Debug.Log(id+"/"+_boundRectInRree);
 	}
+	protected Rect _boundRectInTree  = new Rect();
+	
 	
 	
 	/***************************************
 	 * hit test
 	 ***************************************/
-	
-	override public bool hitTest(Vector2 v){
-		if(!_boundRect.Contains(v)){
+	override public bool hittest(Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		//Debug.Log(newVec);
+		if(!_selfBoundRect.Contains(newVec)){
 			return false;
 		}
-		if(_texture && _textureRenderRect.Contains(v)){
+		if(_texture && _textureRenderRect.Contains(newVec)){
 			return true;
 		}
 		bool isHit = false;
 		DisplayObject child;
 		for(int i=_childList.Count-1;i>=0;i--){
 			child	= _childList[i] as DisplayObject;
-			if(child.hitTest(v)){
+			if(child.hittest(vec)){
 				isHit	= true;
 				break;
 			}
@@ -175,4 +156,59 @@ public class Sprite : DisplayObjectContainer {
 		}
 		return isHit;
 	}
+	
+	override public bool hitTestMouseDispatch(string type,Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		Debug.Log(id+"/"+ newVec + _selfBoundRect+_textureSelfRect);
+		if(!_selfBoundRect.Contains(newVec)){
+			return false;
+		}
+		bool isHit = false;
+		if(_texture && _textureSelfRect.Contains(newVec)){
+			isHit = true;
+		}
+		
+		DisplayObject child;
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hitTestMouseDispatch(type,vec)){
+				isHit	= true;
+				break;
+			}
+			
+		}
+		if(isHit){
+			Debug.Log(id+"/"+type);
+			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
+		}
+		return isHit;
+	}
+	
+	override public bool hitTestTouchDispatch(string type,Touch touch){
+		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
+		
+		if(!_selfBoundRect.Contains(newVec)){
+			return false;
+		}
+		bool isHit = false;
+		if(_texture && _textureSelfRect.Contains(newVec)){
+			isHit = true;
+		}
+		
+		DisplayObject child;
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hitTestTouchDispatch(type,touch)){
+				isHit	= true;
+				break;
+			}
+			
+		}
+		if(isHit){
+			this.dispatchEvent(new TouchEvent(this,type,touch));
+		}
+		return isHit;
+	}
+	
 }

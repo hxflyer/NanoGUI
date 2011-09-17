@@ -20,6 +20,8 @@ public class Stage : DisplayObjectContainer {
 	}
 	
 	override public void render(){
+		//GUI.DrawTexture(_boundRectInRree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+		
 		renderChildren();
 	}
 	
@@ -51,7 +53,7 @@ public class Stage : DisplayObjectContainer {
 		child.parent		= this;
 		child.stage			= this;
 		setTransformInTreeDirty();
-		setOriginalSizeDirty();
+		setBoundRectDirty();
 	}
 	
 	override public void addChildAt(int index, DisplayObject child){
@@ -65,7 +67,7 @@ public class Stage : DisplayObjectContainer {
 		child.parent		= this;
 		child.stage			= this;
 		setTransformInTreeDirty();
-		setOriginalSizeDirty();
+		setBoundRectDirty();
 	}
 	/********************************
 	 * touchs and mouse positions
@@ -77,7 +79,7 @@ public class Stage : DisplayObjectContainer {
 		get {return _touchAry;}
 	}
 	
-	public void sotreTouches(Touch[] touchs){
+	public void updateTouches(Touch[] touchs){
 		
 		if(_touchAry!=null && _touchAry.Count>0){
 			_touchAry.Clear();
@@ -87,19 +89,38 @@ public class Stage : DisplayObjectContainer {
 		}
 	}
 	
+	/********************************
+	 * mouse position
+	 *******************************/
+	
 	
 	private int _mouseX = 0;
 	public int mouseX{
 		get {return _mouseX;}
 	}
+	
 	private int _mouseY = 0;
 	public int mouseY{
 		get {return _mouseY;}
 	}
-	public void sotreMousePosition(Vector2 mousePos){
+	
+	private int _lastMouseX = 0;
+	public int lastMouseX{
+		get {return _lastMouseX;}
+	}
+	
+	private int _lastMouseY = 0;
+	public int lastMouseY{
+		get {return _lastMouseY;}
+	}
+	
+	public void updateMousePosition(Vector2 mousePos,Vector2 deltaPos){
 		_mouseX	= (int)mousePos.x;
 		_mouseY	= (int)mousePos.y;
+		_lastMouseX = (int)deltaPos.x;
+		_lastMouseY = (int)deltaPos.y;
 	}
+	
 	public void cleanMousePosition(){
 		_mouseX	= 0;
 		_mouseY	= 0;
@@ -121,7 +142,7 @@ public class Stage : DisplayObjectContainer {
 	
 	
 	
-	override public void updateOriginalSize(){
+	/*override public void updateOriginalSize(){
 		if(!_isOriginalSizeDirty){
 			return;
 		}
@@ -154,5 +175,5 @@ public class Stage : DisplayObjectContainer {
 		_height	= _originalHeight *_scaleY;
 		
 		setBoundRectDirty();
-	}
+	}*/
 }
