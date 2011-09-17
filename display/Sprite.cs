@@ -62,8 +62,9 @@ public class Sprite : DisplayObjectContainer {
 			//Debug.Log(id+" : "+_transformInTreeRotation);
 			GUI.DrawTexture(_textureRenderRect,_texture);
 			GUIUtility.RotateAroundPivot (-_transformInTreeRotation, _texturRenderRotatePivot);
-			//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+			GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 			
+			Debug.Log(_boundRectInTree);
 		}
 		//Debug.Log("render:"+id+"  rect:"+_textureRenderRect);
 		renderChildren();
@@ -79,7 +80,7 @@ public class Sprite : DisplayObjectContainer {
 		if(!_isBoundRectDirty){
 			return;
 		}
-		
+		_isBoundRectDirty	= false;
 		Vector2 minPos = new Vector2();
 		Vector2 maxPos = new Vector2();
 		if(_texture){
@@ -117,6 +118,7 @@ public class Sprite : DisplayObjectContainer {
 		_originalWidth			= maxPos.x-minPos.x;
 		_originalHeight			= maxPos.y-minPos.y;
 		
+		
 		_selfBoundRect.x		= minPos.x;
 		_selfBoundRect.y		= minPos.y;
 
@@ -126,6 +128,8 @@ public class Sprite : DisplayObjectContainer {
 		// get boundRect, boundRect is related with it's parent
 		_boundRect				= _transform.getBoundRect(minPos,maxPos);
 		_boundRectInRree		= _transformInTree.getBoundRect(minPos,maxPos);
+		_width					= _boundRect.width;
+		_height					= _boundRect.height;
 		//Debug.Log(id+"/"+_boundRectInRree);
 	}
 	protected Rect _boundRectInTree  = new Rect();

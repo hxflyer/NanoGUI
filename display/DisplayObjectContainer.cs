@@ -145,7 +145,7 @@ public class DisplayObjectContainer : DisplayObject {
 		if(!_isBoundRectDirty){
 			return;
 		}
-		
+		_isBoundRectDirty	= false;
 		Vector2 minPos	= new Vector2(999999,999999);
 		Vector2 maxPos	= new Vector2(-999999,-999999);
 		
@@ -183,7 +183,8 @@ public class DisplayObjectContainer : DisplayObject {
 		_boundRect				= _transform.getBoundRect(minPos,maxPos);
 		_boundRectInRree		= _transformInTree.getBoundRect(minPos,maxPos);
 		
-		
+		_width					= _boundRect.width;
+		_height					= _boundRect.height;
 	}
 	protected Rect _boundRectInRree  = new Rect();
 	

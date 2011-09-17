@@ -34,7 +34,9 @@ public class GuiBuildTest : MonoBehaviour {
 		//Debug.Log(Stage.instance.mouseX+"/"+Stage.instance.mouseY);
 		if(_isRotate){
 			s.rotation ++;
+			
 		}
+		
 	}
 	
 	void toucheHandler(GuiEvent e){

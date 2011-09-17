@@ -245,6 +245,7 @@ public class DisplayObject : EventDispatcher {
 		if(!_isBoundRectDirty){
 			return;
 		}
+		_isBoundRectDirty	= false;
 		_selfBoundRect.x	= 0;
 		_selfBoundRect.y	= 0;
 		_selfBoundRect.width= _originalWidth/_scaleX;
