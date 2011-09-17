@@ -14,7 +14,6 @@ public class DisplayObject : EventDispatcher {
 	
 	
 	public virtual void destroy(){
-		removeAllChildren();
 		parent.removeChild(this);
 	}
 	

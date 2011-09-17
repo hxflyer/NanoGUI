@@ -8,7 +8,10 @@ public class DisplayObjectContainer : DisplayObject {
 	}
 	
 	
-	
+	override public void destroy(){
+		removeAllChildren();
+		parent.removeChild(this);
+	}
 	/***************************************
 	 * childlist
 	 ***************************************/
