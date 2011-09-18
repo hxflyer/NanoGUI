@@ -40,6 +40,7 @@ public class EventDispatcher  {
 		if(eventHandlerList==null){
 			return;
 		}
+		e.target	= this;
 		foreach(EventTerm term in eventHandlerList){
 			if(term.eventType == e.eventType){
 				term.function(e);

@@ -20,9 +20,7 @@ public class TouchEvent : GuiEvent {
 	
 	public Touch touch;
 	
-	public TouchEvent (EventDispatcher target,string type,Touch touch) {
-		
-		this.target		= target;
+	public TouchEvent (string type,Touch touch) {
 		eventType		= type;
 		this.touch		= touch;
 	}

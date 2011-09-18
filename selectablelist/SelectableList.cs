@@ -69,7 +69,7 @@ public class SelectableList :SelectableItem {
 		}
 		_selectedItem	= item;
 		_selectedItem.select();
-		this.dispatchEvent(new GuiEvent(this,GuiEvent.CHANGE));
+		this.dispatchEvent(new GuiEvent(GuiEvent.CHANGE));
 	}
 	
 	public void selectItemByIndex(int index){
@@ -80,7 +80,7 @@ public class SelectableList :SelectableItem {
 		if(_selectedItem!=null){
 			_selectedItem.unselect();
 			_selectedItem	= null;
-			this.dispatchEvent(new GuiEvent(this,GuiEvent.CHANGE));
+			this.dispatchEvent(new GuiEvent(GuiEvent.CHANGE));
 		}
 	}
 }

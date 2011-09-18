@@ -16,6 +16,7 @@ public class SelectableItem :Sprite {
 	public int listIndex	= -1;
 	public SelectableList parentList;
 	private bool _isSelected	= false;
+	
 	public bool isSelected{
 		get {return _isSelected;}
 	}
@@ -24,7 +25,7 @@ public class SelectableItem :Sprite {
 			return;
 		}
 		_isSelected		= true;
-		this.dispatchEvent(new GuiEvent(this,GuiEvent.SELECT));
+		this.dispatchEvent(new GuiEvent(GuiEvent.SELECT));
 	}
 	
 	
@@ -33,6 +34,6 @@ public class SelectableItem :Sprite {
 			return;
 		}
 		_isSelected		= false;
-		this.dispatchEvent(new GuiEvent(this,GuiEvent.UNSELECT));
+		this.dispatchEvent(new GuiEvent(GuiEvent.UNSELECT));
 	}
 }

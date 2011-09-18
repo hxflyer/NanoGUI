@@ -51,7 +51,7 @@ public class DisplayObject : EventDispatcher {
 	}
 	
 	public virtual void updateTransform(){
-		this.dispatchEvent(new GuiEvent(this,GuiEvent.ENTER_FRAME));
+		this.dispatchEvent(new GuiEvent(GuiEvent.ENTER_FRAME));
 		if(!_isTransformDirty){
 			return;
 		}
@@ -338,7 +338,7 @@ public class DisplayObject : EventDispatcher {
 		}
 		
 		if(isHit){
-			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
+			this.dispatchEvent(new MouseEvent(type,newVec,vec));
 		}
 		return isHit;
 	}
@@ -352,8 +352,24 @@ public class DisplayObject : EventDispatcher {
 		}
 		
 		if(isHit){
-			this.dispatchEvent(new TouchEvent(this,type,touch));
+			_touchList.Add(touch);
+			this.dispatchEvent(new TouchEvent(type,touch));
 		}
 		return isHit;
+	}
+	
+	
+	/***************************************
+	 * touches
+	 ***************************************/
+	
+	protected ArrayList _touchList	= new ArrayList();
+	protected int _swipeCounter		= 0;
+	public virtual void clearTouchs(){
+		_touchList.Clear();
+	}
+	
+	public virtual void updateTouchs(){
+		
 	}
 }

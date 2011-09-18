@@ -9,9 +9,7 @@ public class MouseEvent : GuiEvent {
 	public Vector2 mouseLocalPosition;
 	public Vector2 mouseGlobalPosition;
 	
-	public MouseEvent (EventDispatcher target,string type,Vector2 localPosition,Vector2 globalPosition) {
-		
-		this.target		= target;
+	public MouseEvent (string type,Vector2 localPosition,Vector2 globalPosition) {
 		eventType		= type;
 		mouseLocalPosition	= localPosition;
 		mouseGlobalPosition	= globalPosition;

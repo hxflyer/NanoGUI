@@ -15,8 +15,7 @@ public class GuiEvent {
 	
 	public GuiEvent (){
 	}
-	public GuiEvent (EventDispatcher target,string type) {
-		this.target = target;
+	public GuiEvent (string type) {
 		eventType	= type;
 	}
 	

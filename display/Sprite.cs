@@ -8,6 +8,8 @@ public class Sprite : DisplayObjectContainer {
 		_texture	= texture;
 		_originalWidth	= _texture.width;
 		_originalHeight	= _texture.height;
+		_width			= _texture.width;
+		_height			= _texture.height;
 		_textureSelfRect.width = _texture.width;
 		_textureSelfRect.height= _texture.height;
 	}
@@ -185,12 +187,13 @@ public class Sprite : DisplayObjectContainer {
 		}
 		if(isHit){
 			//Debug.Log(id+"/"+type);
-			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
+			this.dispatchEvent(new MouseEvent(type,newVec,vec));
 		}
 		return isHit;
 	}
 	
 	override public bool hitTestTouchDispatch(string type,Touch touch){
+		
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		
@@ -212,9 +215,12 @@ public class Sprite : DisplayObjectContainer {
 			
 		}
 		if(isHit){
-			this.dispatchEvent(new TouchEvent(this,type,touch));
+			_touchList.Add(touch);
+			this.dispatchEvent(new TouchEvent(type,touch));
 		}
 		return isHit;
 	}
+	
+	
 	
 }

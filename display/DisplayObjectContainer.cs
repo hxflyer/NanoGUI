@@ -214,6 +214,7 @@ public class DisplayObjectContainer : DisplayObject {
 		return isHit;
 	}
 	
+	
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 
@@ -231,12 +232,14 @@ public class DisplayObjectContainer : DisplayObject {
 			
 		}
 		if(isHit){
-			this.dispatchEvent(new MouseEvent(this,type,newVec,vec));
+			this.dispatchEvent(new MouseEvent(type,newVec,vec));
 		}
 		return isHit;
 	}
 	
+	
 	override public bool hitTestTouchDispatch(string type,Touch touch){
+		
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		if(!_boundRectInTree.Contains(vec)){
@@ -253,8 +256,83 @@ public class DisplayObjectContainer : DisplayObject {
 			
 		}
 		if(isHit){
-			this.dispatchEvent(new TouchEvent(this,type,touch));
+			_touchList.Add(touch);
+			this.dispatchEvent(new TouchEvent(type,touch));
 		}
 		return isHit;
+	}
+	
+	
+	override public void clearTouchs(){
+		foreach(DisplayObject child in _childList){
+			child.clearTouchs();
+		}
+		_touchList.Clear();
+	}
+	
+	
+	override public void updateTouchs(){
+		//Debug.Log(id+ " updateTouchs");
+		/*if(_touchList.Count==0){
+			return;
+		}*/
+		foreach(DisplayObject child in _childList){
+			child.updateTouchs();
+		}
+		
+		if(_touchList.Count==1){
+			//Debug.Log("solotouch check");
+			Touch soloTouch	= (Touch)_touchList[0];
+			
+			if(soloTouch.phase	== TouchPhase.Ended){
+				if(_swipeCounter>GestureEvent.swipeCountThreshold){
+					this.dispatchEvent(new GestureEvent(GestureEvent.SWIPE));
+				}
+				_swipeCounter = 0;
+			}else if(soloTouch.phase == TouchPhase.Moved || soloTouch.phase	== TouchPhase.Began){
+				if(Mathf.Abs(soloTouch.deltaPosition.x)>GestureEvent.swipeDeltaThreshold){
+					_swipeCounter ++;
+				}else{
+					_swipeCounter = 0;
+				}
+			}else{
+				_swipeCounter = 0;
+			}
+		
+		}
+		if(_touchList.Count==2){
+			//Debug.Log("double check");
+			Touch firstTouch	= (Touch)_touchList[0];
+			Touch secondTouch	= (Touch)_touchList[1];
+			//scale
+			float lastDistance	= Vector2.Distance(firstTouch.position-firstTouch.deltaPosition,secondTouch.position-secondTouch.deltaPosition);
+			float distance		= Vector2.Distance(firstTouch.position,secondTouch.position);
+			float deltaScale	= distance/lastDistance;
+			
+			if(Mathf.Abs(deltaScale-1.0f)>0.0001){
+				GestureEvent	e = new GestureEvent(GestureEvent.ZOOM);
+				e.deltaScale	= deltaScale;
+				this.dispatchEvent(e);
+			}
+			//rotation
+			float lastAng		= Mathf.Atan2( (secondTouch.position.y-secondTouch.deltaPosition.y)- (firstTouch.position.y-firstTouch.deltaPosition.y)  ,
+			                             (firstTouch.position.x-firstTouch.deltaPosition.x) - (secondTouch.position.x-secondTouch.deltaPosition.x))*Mathf.Rad2Deg;
+			float ang			= Mathf.Atan2(secondTouch.position.y - firstTouch.position.y , firstTouch.position.x - secondTouch.position.x)*Mathf.Rad2Deg;
+			float deltaRotation		= ang-lastAng;
+			if(Mathf.Abs(deltaRotation)>.01){
+				GestureEvent	e = new GestureEvent(GestureEvent.ROTATE);
+				e.deltaRotation	= deltaRotation;
+				this.dispatchEvent(e);
+			}
+			//pan
+			
+			Vector2 avgDeltaPos	= (firstTouch.deltaPosition+secondTouch.deltaPosition)/2;
+			if(Mathf.Abs(avgDeltaPos.x)>GestureEvent.panThreshold || Mathf.Abs(avgDeltaPos.y)>GestureEvent.panThreshold){
+				GestureEvent	e = new GestureEvent(GestureEvent.PAN);
+				avgDeltaPos.y	= -avgDeltaPos.y;
+				e.deltaPan		= avgDeltaPos;
+				this.dispatchEvent(e);
+			}
+		}
 	}
 }

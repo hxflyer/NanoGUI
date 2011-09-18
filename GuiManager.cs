@@ -48,24 +48,26 @@ public class GuiManager : MonoBehaviour {
 		stage.updateTouches(Input.touches);
 		
 		if(Input.touches.Length==1){
-			_stage.updateMousePosition(new Vector2(Input.touches[0].position.x,stage.height-Input.touches[0].position.y),new Vector2(Input.touches[0].deltaPosition.x,-Input.touches[0].deltaPosition.y));
+			stage.updateMousePosition(new Vector2(Input.touches[0].position.x,stage.height-Input.touches[0].position.y),new Vector2(Input.touches[0].deltaPosition.x,-Input.touches[0].deltaPosition.y));
 		}
+		stage.clearTouchs();
 		foreach(Touch touch in Input.touches)
     	{
 			//Debug.Log(touch.position);
 			if (touch.phase == TouchPhase.Began){
-				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_BEGAN,touch);
+				stage.hitTestTouchDispatch(TouchEvent.TOUCH_BEGAN,touch);
 			}else if(touch.phase == TouchPhase.Moved){
-				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_MOVED,touch);
+				stage.hitTestTouchDispatch(TouchEvent.TOUCH_MOVED,touch);
 			}else if(touch.phase == TouchPhase.Ended){
-				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_ENDED,touch);
+				stage.hitTestTouchDispatch(TouchEvent.TOUCH_ENDED,touch);
 			}else if(touch.phase == TouchPhase.Canceled){
-				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_CANCELED,touch);
+				stage.hitTestTouchDispatch(TouchEvent.TOUCH_CANCELED,touch);
 			}else if(touch.phase == TouchPhase.Stationary){
-				Stage.instance.hitTestTouchDispatch(TouchEvent.TOUCH_STATIONARY,touch);
+				stage.hitTestTouchDispatch(TouchEvent.TOUCH_STATIONARY,touch);
 			}
 			
 		}
+		stage.updateTouchs();
 	}
 	
 	void OnGUI(){
