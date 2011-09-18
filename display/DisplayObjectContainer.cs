@@ -172,22 +172,43 @@ public class DisplayObjectContainer : DisplayObject {
 			}
 		}
 		
-		_originalWidth			= maxPos.x-minPos.x;
-		_originalHeight			= maxPos.y-minPos.y;
-		
-		
-		// get boundRect, boundRect is related with it's parent
 		_boundRect.x			= minPos.x;
 		_boundRect.y			= minPos.y;
 		_boundRect.width		= maxPos.x-minPos.x;
 		_boundRect.height		= maxPos.y-minPos.y;
-		_width					= _boundRect.width;
-		_height					= _boundRect.height;
 		
-		//Debug.Log(id+_boundRect);
+		minPos			= new Vector2(999999,999999);
+		maxPos			= new Vector2(-999999,-999999);
+		
 		if(_parent!=null){
 			_boundRectInTree	= _parent.transformInTree.getBoundRect(minPos,maxPos);
 		}
+		
+		
+		foreach(DisplayObject child in _childList){
+			
+			
+			if(child.boundRect.x < minPos.x){
+				minPos.x	= child.boundRect.x;
+			}
+			if(child.boundRect.x+child.boundRect.width > maxPos.x){
+				maxPos.x	= child.boundRect.x+child.boundRect.width;
+			}
+			if(child.boundRect.y < minPos.y){
+				minPos.y	= child.boundRect.y;
+			}
+			if(child.boundRect.y+child.boundRect.height > maxPos.y){
+				maxPos.y	= child.boundRect.y+child.boundRect.height;
+			}
+		}
+		
+		_originalWidth			= maxPos.x-minPos.x;
+		_originalHeight			= maxPos.y-minPos.y;
+		_width					= _originalWidth*_scaleX;
+		_height					= _originalHeight*_scaleY;
+		
+		
+		
 	}
 
 	

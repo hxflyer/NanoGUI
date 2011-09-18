@@ -52,6 +52,10 @@ public class Sprite : DisplayObjectContainer {
 		}
 		
 		if(_texture){
+			if(_transformInTree==null){
+				updateTransformInTree();
+				//Debug.Log("no transfrom in tree");
+			}
 			_textureRenderRect.x	= _transformInTree.tx;
 			_textureRenderRect.y	= _transformInTree.ty;
 			_textureRenderRect.width	= _texture.width * _transformInTreeScale.x;
@@ -118,23 +122,49 @@ public class Sprite : DisplayObjectContainer {
 				maxPos.y	= childBoundRect.y+childBoundRect.height;
 			}
 		}
-		
-		_originalWidth			= maxPos.x-minPos.x;
-		_originalHeight			= maxPos.y-minPos.y;
-		
-		
 		// get boundRect, boundRect is related with it's parent
 		_boundRect.x			= minPos.x;
 		_boundRect.y			= minPos.y;
 		_boundRect.width		= maxPos.x-minPos.x;
 		_boundRect.height		= maxPos.y-minPos.y;
-		_width					= _boundRect.width;
-		_height					= _boundRect.height;
 		//Debug.Log(id+_boundRect);
 		if(_parent!=null){
 			_boundRectInTree		= _parent.transformInTree.getBoundRect(minPos,maxPos);
 		}
-		//Debug.Log(id+"/"+_boundRectInRree);
+		
+		
+		if(_texture!=null){
+			minPos.x	= _textureSelfRect.x;
+			minPos.y	= _textureSelfRect.y;
+			maxPos.x	= _textureSelfRect.width+_textureSelfRect.x;
+			maxPos.y	= _textureSelfRect.height+_textureSelfRect.y;
+		}else{
+			minPos.x	= 999999;
+			minPos.y	= 999999;
+			maxPos.x	= -999999;
+			maxPos.y	= -999999;
+		}
+		foreach(DisplayObject child in _childList){
+			
+			
+			if(child.boundRect.x < minPos.x){
+				minPos.x	= child.boundRect.x;
+			}
+			if(child.boundRect.x+child.boundRect.width > maxPos.x){
+				maxPos.x	= child.boundRect.x+child.boundRect.width;
+			}
+			if(child.boundRect.y < minPos.y){
+				minPos.y	= child.boundRect.y;
+			}
+			if(child.boundRect.y+child.boundRect.height > maxPos.y){
+				maxPos.y	= child.boundRect.y+child.boundRect.height;
+			}
+		}
+		
+		_originalWidth			= maxPos.x-minPos.x;
+		_originalHeight			= maxPos.y-minPos.y;
+		_width					= _originalWidth*_scaleX;
+		_height					= _originalHeight*_scaleY;
 	}
 
 	

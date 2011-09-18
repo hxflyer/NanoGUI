@@ -215,7 +215,13 @@ public class DisplayObject : EventDispatcher {
 	protected float _originalWidth	= 0;
 	protected float _originalHeight	= 0;
 	
+	public float originalWidth{
+		get {return _originalWidth;}
+	}
 	
+	public float originalHeight{
+		get {return _originalHeight;}
+	}
 	/***************************************
 	 * bound rect
 	 ***************************************/
