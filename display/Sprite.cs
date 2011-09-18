@@ -24,10 +24,10 @@ public class Sprite : DisplayObjectContainer {
 	public Texture texture {
     	get { return _texture; }
     	set { _texture = value;
-			setBoundRectDirty();
 			_textureSelfRect.width = _texture.width;
 			_textureSelfRect.height= _texture.height;
-			
+			setBoundRectDirty();
+			updateBoundRect();
 		}
 	}
 	
@@ -53,8 +53,8 @@ public class Sprite : DisplayObjectContainer {
 		
 		if(_texture){
 			if(_transformInTree==null){
-				//updateTransformInTree();
-				Debug.Log(id+"no transfrom in tree");
+				updateTransformInTree();
+				//Debug.Log("no transfrom in tree");
 			}
 			_textureRenderRect.x	= _transformInTree.tx;
 			_textureRenderRect.y	= _transformInTree.ty;
@@ -174,6 +174,7 @@ public class Sprite : DisplayObjectContainer {
 	 * hit test
 	 ***************************************/
 	override public bool hittest(Vector2 vec){
+
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		//Debug.Log(newVec);
 		if(!_boundRectInTree.Contains(vec)){
@@ -196,6 +197,9 @@ public class Sprite : DisplayObjectContainer {
 	}
 	
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
+		if(!mouseEnable){
+			return false;
+		}
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		//Debug.Log(id+"/"+ newVec + _selfBoundRect+_textureSelfRect);
 		if(!_boundRectInTree.Contains(vec)){
@@ -223,7 +227,9 @@ public class Sprite : DisplayObjectContainer {
 	}
 	
 	override public bool hitTestTouchDispatch(string type,Touch touch){
-		
+		if(!mouseEnable){
+			return false;
+		}
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		

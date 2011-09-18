@@ -237,6 +237,9 @@ public class DisplayObjectContainer : DisplayObject {
 	
 	
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
+		if(!mouseEnable){
+			return false;
+		}
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 
 		if(!_boundRectInTree.Contains(vec)){
@@ -260,7 +263,9 @@ public class DisplayObjectContainer : DisplayObject {
 	
 	
 	override public bool hitTestTouchDispatch(string type,Touch touch){
-		
+		if(!mouseEnable){
+			return false;
+		}
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		if(!_boundRectInTree.Contains(vec)){
@@ -297,6 +302,9 @@ public class DisplayObjectContainer : DisplayObject {
 		/*if(_touchList.Count==0){
 			return;
 		}*/
+		if(!mouseEnable){
+			return;
+		}
 		foreach(DisplayObject child in _childList){
 			child.updateTouchs();
 		}

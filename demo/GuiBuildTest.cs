@@ -7,41 +7,12 @@ public class GuiBuildTest : MonoBehaviour {
 	public Sprite s2;
 
 	void Start () {
-		Texture2D texture = Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;
-		s	= new Sprite();
+		Texture2D texture = Resources.Load("page/compare",typeof(Texture2D)) as Texture2D;
+		s	= new Sprite(texture);
 		s.id	= "s";
 		GuiManager.stage.addChild(s);
-		Texture2D texture2 = Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;
-		s1	= new Sprite(texture2);
-		s.addChild(s1);
-		//s.scaleX	= .3f;
-		//s.scaleY	= .3f;
-		
-		s1.x	= -s1.width/2;
-		s1.y	= -s1.height/2;
-		Debug.Log(s1.width);
-		s1.id	= "s1";
-		/*s2	= new Sprite(texture2);
-		s1.addChild(s2);
-		s2.x	= 200;
-		s2.y	= 400;
-		s2.id	= "s2";*/
-		
-		//s.scaleX	= .5f;
-		//s.scaleY	= .5f;
-		//s.texture	= Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;
-		//s.addEventListner(GuiEvent.ENTER_FRAME,new EventDispatcher.CallBack(enterFrameHandler));
-		s.addEventListner(TouchEvent.TOUCH_BEGAN,new EventDispatcher.CallBack(toucheHandler));
-		//s.addEventListner(MouseEvent.MOUSE_DOWN,new EventDispatcher.CallBack(mouseDownHandler));
-		
-		s.addEventListner(GestureEvent.SWIPE,new EventDispatcher.CallBack(swipeHandler));
-		s.addEventListner(GestureEvent.ROTATE,new EventDispatcher.CallBack(rotateHandler));
-		s.addEventListner(GestureEvent.ZOOM,new EventDispatcher.CallBack(zoomHandler));
-		s.addEventListner(GestureEvent.PAN,new EventDispatcher.CallBack(panHandler));
-		s.x		= 200;
-		s.y		= 200;
-		//s.rotation	= 40.0f;
-		
+		s.width	= 100;
+		s.height = 100;
 	}
 	
 	void enterFrameHandler(GuiEvent e){

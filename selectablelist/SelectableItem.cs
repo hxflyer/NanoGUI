@@ -5,7 +5,7 @@ public class SelectableItem :Sprite {
 
 	// Use this for initialization
 	
-	public SelectableItem (Texture2D texture):base(texture){
+	public SelectableItem (Texture texture):base(texture){
 		
 	}
 	

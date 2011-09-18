@@ -11,7 +11,7 @@ public class DisplayObject : EventDispatcher {
 	
 	// tag: used for storing any variable
 	public object tag;
-	
+	public bool mouseEnable	= true;
 	
 	public virtual void destroy(){
 		parent.removeChild(this);

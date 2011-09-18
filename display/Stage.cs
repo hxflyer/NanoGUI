@@ -38,7 +38,7 @@ public class Stage : DisplayObjectContainer {
 		
 		if(_isTransformInTreeDirty){
 			_isTransformInTreeDirty	= false;
-			_transformInTree		= _transform.clone();
+			_transformInTree		= _transform;
 			_transformInTreeScale	= new Vector2(1,1);
 			setBoundRectDirty();
 		}
