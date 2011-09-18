@@ -53,8 +53,8 @@ public class Sprite : DisplayObjectContainer {
 		
 		if(_texture){
 			if(_transformInTree==null){
-				updateTransformInTree();
-				//Debug.Log("no transfrom in tree");
+				//updateTransformInTree();
+				Debug.Log(id+"no transfrom in tree");
 			}
 			_textureRenderRect.x	= _transformInTree.tx;
 			_textureRenderRect.y	= _transformInTree.ty;
