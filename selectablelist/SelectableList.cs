@@ -11,6 +11,8 @@ public class SelectableList :SelectableItem {
 	public SelectableList () {
 	
 	}
+	public SelectableList(Texture texture, float textureWidth,float textureHeight):base(texture,textureWidth,textureHeight){
+	}
 	
 	public virtual void addItem(SelectableItem item){
 		item.listIndex	= _itemAry.Count;

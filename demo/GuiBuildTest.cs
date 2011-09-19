@@ -7,12 +7,12 @@ public class GuiBuildTest : MonoBehaviour {
 	public Sprite s2;
 
 	void Start () {
-		Texture2D texture = Resources.Load("page/compare",typeof(Texture2D)) as Texture2D;
-		s	= new Sprite(texture);
+		Texture2D texture = Resources.Load("testimg3",typeof(Texture2D)) as Texture2D;
+		s	= new Sprite(texture,100,100);
 		s.id	= "s";
 		GuiManager.stage.addChild(s);
-		s.width	= 100;
-		s.height = 100;
+		//s.width	= 100;
+		//s.height = 100;
 	}
 	
 	void enterFrameHandler(GuiEvent e){

@@ -8,7 +8,8 @@ public class SelectableItem :Sprite {
 	public SelectableItem (Texture texture):base(texture){
 		
 	}
-	
+	public SelectableItem(Texture texture, float textureWidth,float textureHeight):base(texture,textureWidth,textureHeight){
+	}
 	public SelectableItem () {
 	
 	}

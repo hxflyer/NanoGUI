@@ -13,6 +13,15 @@ public class Sprite : DisplayObjectContainer {
 		_textureSelfRect.width = _texture.width;
 		_textureSelfRect.height= _texture.height;
 	}
+	public Sprite(Texture texture, float textureWidth,float textureHeight){
+		_texture	= texture;
+		_originalWidth	= textureWidth;
+		_originalHeight	= textureHeight;
+		_width			= textureWidth;
+		_height			= textureHeight;
+		_textureSelfRect.width = textureWidth;
+		_textureSelfRect.height= textureHeight;
+	}
 	public Sprite (){
 		
 	}
@@ -29,6 +38,13 @@ public class Sprite : DisplayObjectContainer {
 			setBoundRectDirty();
 			updateBoundRect();
 		}
+	}
+	public void setTexutre(Texture texture, float textureWidth,float textureHeight){
+		_texture	= texture;
+		_textureSelfRect.width = textureWidth;
+		_textureSelfRect.height= textureHeight;
+		setBoundRectDirty();
+		updateBoundRect();
 	}
 	
 	protected Rect _textureRenderRect	= new Rect();
@@ -58,8 +74,9 @@ public class Sprite : DisplayObjectContainer {
 			}
 			_textureRenderRect.x	= _transformInTree.tx;
 			_textureRenderRect.y	= _transformInTree.ty;
-			_textureRenderRect.width	= _texture.width * _transformInTreeScale.x;
-			_textureRenderRect.height	= _texture.height * _transformInTreeScale.y;
+			_textureRenderRect.width	= _textureSelfRect.width * _transformInTreeScale.x;
+			_textureRenderRect.height	= _textureSelfRect.height * _transformInTreeScale.y;
+			//Debug.Log(_textureRenderRect);
 			GUI.color = new Color( 1, 1, 1, _alphaInTree );
 			_texturRenderRotatePivot.x	= _transformInTree.tx;
 			_texturRenderRotatePivot.y	= _transformInTree.ty;
