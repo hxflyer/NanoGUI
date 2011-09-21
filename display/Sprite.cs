@@ -13,6 +13,7 @@ public class Sprite : DisplayObjectContainer {
 		_textureSelfRect.width = _texture.width;
 		_textureSelfRect.height= _texture.height;
 	}
+	
 	public Sprite(Texture texture, float textureWidth,float textureHeight){
 		_texture	= texture;
 		_originalWidth	= textureWidth;
@@ -22,6 +23,7 @@ public class Sprite : DisplayObjectContainer {
 		_textureSelfRect.width = textureWidth;
 		_textureSelfRect.height= textureHeight;
 	}
+	
 	public Sprite (){
 		
 	}
@@ -35,16 +37,15 @@ public class Sprite : DisplayObjectContainer {
     	set { _texture = value;
 			_textureSelfRect.width = _texture.width;
 			_textureSelfRect.height= _texture.height;
-			setBoundRectDirty();
-			updateBoundRect();
+			updateParentBoundRect();
 		}
 	}
+	
 	public void setTexutre(Texture texture, float textureWidth,float textureHeight){
 		_texture	= texture;
 		_textureSelfRect.width = textureWidth;
 		_textureSelfRect.height= textureHeight;
-		setBoundRectDirty();
-		updateBoundRect();
+		updateParentBoundRect();
 	}
 	
 	protected Rect _textureRenderRect	= new Rect();
@@ -85,7 +86,7 @@ public class Sprite : DisplayObjectContainer {
 			//Debug.Log(id+" : "+_transformInTreeRotation);
 			GUI.DrawTexture(_textureRenderRect,_texture);
 			GUIUtility.RotateAroundPivot (-_transformInTreeRotation, _texturRenderRotatePivot);
-			//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+			GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		}
 		//Debug.Log("render:"+id+"  rect:"+_textureRenderRect);
 		renderChildren();
@@ -94,15 +95,6 @@ public class Sprite : DisplayObjectContainer {
 	
 	
 	override public void updateBoundRect(){
-		
-		for(int i=0;i<_childList.Count;i++){
-			(_childList[i] as DisplayObject).updateBoundRect();
-		}
-		if(!_isBoundRectDirty){
-			return;
-		}
-		_isBoundRectDirty	= false;
-		
 		Vector2 minPos = new Vector2();
 		Vector2 maxPos = new Vector2();
 		
@@ -144,11 +136,11 @@ public class Sprite : DisplayObjectContainer {
 		_boundRect.y			= minPos.y;
 		_boundRect.width		= maxPos.x-minPos.x;
 		_boundRect.height		= maxPos.y-minPos.y;
-		//Debug.Log(id+_boundRect);
-		if(_parent!=null){
-			_boundRectInTree		= _parent.transformInTree.getBoundRect(minPos,maxPos);
-		}
 		
+		
+		if(_parent!=null){
+			_boundRectInTree		= _parent.transformInTree.getBoundRect(_boundRect);
+		}		
 		
 		if(_texture!=null){
 			minPos.x	= _textureSelfRect.x;
@@ -182,9 +174,9 @@ public class Sprite : DisplayObjectContainer {
 		_originalHeight			= maxPos.y-minPos.y;
 		_width					= _originalWidth*_scaleX;
 		_height					= _originalHeight*_scaleY;
+		
+		Debug.Log(id + "  updateBoundRectInTree"+_boundRectInTree);
 	}
-
-	
 	
 	
 	/***************************************
@@ -214,7 +206,7 @@ public class Sprite : DisplayObjectContainer {
 	}
 	
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
-		if(!mouseEnable){
+		if(!mouseEnable || !_visible){
 			return false;
 		}
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
@@ -244,7 +236,7 @@ public class Sprite : DisplayObjectContainer {
 	}
 	
 	override public bool hitTestTouchDispatch(string type,Touch touch){
-		if(!mouseEnable){
+		if(!mouseEnable || !_visible){
 			return false;
 		}
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);

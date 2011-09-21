@@ -1,80 +1,112 @@
+/**
+ * VERSION: 0.9
+ * DATE: 2011-09-20
+ * c#
+ * author: huang xiang
+ * hxflyer@gmail.com
+ * www.hxflyer.com
+ **/
+
+
+
+
+/**
+ * DisplayObject is the basic class in rendering tree, each visible object on stage must extends from this Class
+ * this Class has alot uncomplete methods, the updateTouchs(), updateBoundRect() and hitTestMouseDispatch() are 
+ * not fully functional, 
+ * nomrally this Class should not be directly use as parent Class by anybody, if you want to make a functional 
+ * display Class you should extend it from Sprite
+ **/
+
+
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class DisplayObject : EventDispatcher {
 	
 
 	public DisplayObject () {
-
 	}
 	
 	
 	// tag: used for storing any variable
 	public object tag;
+	
+	//when mouse enable == alse, it will mute all touch events and mouse events
 	public bool mouseEnable	= true;
+	
 	
 	public virtual void destroy(){
 		parent.removeChild(this);
 	}
 	
+	public virtual void dispatchEnterFrame(){
+		this.dispatchEvent(new GuiEvent(GuiEvent.ENTER_FRAME));
+		
+	}
 	/***************************************
 	 * 2d transform
 	 ***************************************/
 	
+	/*
+	 * transform and transformInTree are 2d matrix
+	 * transform is for store 2d rotation,scaling, movement relate to parent
+	 * transformInTree is for store 2d rotation,scaling, movement relate to stage
+	 */
 	protected Transform2D	_transform	= new Transform2D();
 	
 	public Transform2D transform {
     	get { return _transform; }
-    	private set { _transform = value;}
 	}
 	
+
 	protected Transform2D	_transformInTree;
 	
 	public Transform2D transformInTree {
     	get { return _transformInTree; }
-    	private set { _transformInTree = value;}
 	}
+	
+	
 	protected Transform2D	_transformInTreeInverted;
 	public Transform2D transformInTreeInverted{
 		get {	
-				if(_transformInTreeInverted==null){
-					_transformInTreeInverted=_transformInTree.getInverted();
+				if(_transformInTreeInverted == null){
+					_transformInTreeInverted = _transformInTree.getInverted();
 				}
 				return _transformInTreeInverted;
 			}
 	}
 	
 	
+	//update transform
+	
 	protected bool _isTransformDirty	= true;
+	
 	public void setTransFormDirty(){
 		_isTransformDirty	= true;
 	}
 	
 	public virtual void updateTransform(){
-		this.dispatchEvent(new GuiEvent(GuiEvent.ENTER_FRAME));
-		if(!_isTransformDirty){
-			return;
-		}
-		_isTransformDirty	= false;
 		_transform.identity();
 		_transform.setTranslate(_x,_y);
 		_transform.rotate(_rotation/Mathf.Rad2Deg);
 		_transform.scale(_scaleX,_scaleY);
-		
-		setTransformInTreeDirty();
-		if(_parent!=null){
-			_parent.setBoundRectDirty();
-		}
 	}
 	
 	
 	//trnsform in render tree
-	
+	 /*
+	  * sometimes transformInTree need to be update but transform don't need, so these 2 update functions are separated
+	 */
 	protected bool _isTransformInTreeDirty	= true;
 	
 	public virtual void setTransformInTreeDirty(){
 		_isTransformInTreeDirty	= true;
 	}
+	
+	//scale and rotation are both can be get from transformInTree, but it will need trigonometric calculation
+	//directly cache these as variable is cheaper
 	
 	protected Vector2 _transformInTreeScale;
 	public Vector2 transformInTreeScale{
@@ -82,129 +114,141 @@ public class DisplayObject : EventDispatcher {
 		private set {_transformInTreeScale = value;}
 	}
 	
-	protected float	_transformInTreeRotation	= 0;
+	protected float	_transformInTreeRotation = 0;
 	public float transformInTreeRotation{
 		get {return _transformInTreeRotation;}
 		private set {_transformInTreeRotation = value;}
 	}
 
-	
-	
 	public virtual void updateTransformInTree(){
 		
-		if(!_isTransformInTreeDirty){
-			return;
+		if(_parent==null){
+			_transformInTree.identity();
+			_transformInTreeScale.x	= _scaleX;
+			_transformInTreeScale.y	= _scaleY;
+			_transformInTreeInverted= null;
+		}else{
+			_transformInTree		= Transform2D.multiply(_parent.transformInTree,_transform);
+			_transformInTreeScale.x	= _scaleX*_parent.transformInTreeScale.x;
+			_transformInTreeScale.y	= _scaleY*_parent.transformInTreeScale.y;
+			_transformInTreeRotation= _rotation + _parent.transformInTreeRotation;
+			_transformInTreeInverted= null;
 		}
-		_isTransformInTreeDirty	= false;
-		_transformInTree		= Transform2D.multiply(_parent.transformInTree,_transform);
-		_transformInTreeScale.x	= _scaleX*_parent.transformInTreeScale.x;
-		_transformInTreeScale.y	= _scaleY*_parent.transformInTreeScale.y;
-		_transformInTreeRotation	= _rotation + _parent.transformInTreeRotation;
-		_transformInTreeInverted= null;
-		setBoundRectDirty();
 	}
 	
 	
-	// position , scale , size
+	public virtual void updateRelatedBoundRect(){
+		updateBoundRect();
+		if(_parent!=null){
+			_parent.updateParentBoundRect();
+		}
+	}
+	public void updateParentBoundRect(){
+		updateBoundRect();
+		if(_parent!=null){
+			_parent.updateParentBoundRect();
+		}
+	}
 	
+	public virtual void updateBoundRectInTree(){
+	}
+	// position , scale , size
+	// transfrom can not be modified from outsied
 	protected float _x = 0.0f;
-	public float x {
+	public virtual float x {
     	get { return _x; }
     	set { 
 			_x = value;
 			_transform.setTranslateX(_x);
-			setTransformInTreeDirty();
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
 	
 	protected float _y = 0.0f;
-	public float y {
+	public virtual float y {
     	get { return _y; }
     	set { 
 			_y = value;
 			_transform.setTranslateY(_y);
-			setTransformInTreeDirty();
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
 	
 	protected float _width = 0.0f;
-	public float width {
+	public virtual float width {
 		get { return _width; }
     	set {
 			_width = value;
 			if(_originalWidth!=0){
 				_scaleX	= _width/_originalWidth;
 			}
-			_isTransformDirty	= true;
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransform();
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
 	
 	protected float _height = 0.0f;
-	public float height {
+	public virtual float height {
     	get { return _height; }
     	set {
 			_height = value;
 			if(_originalHeight!=0){
 				_scaleY	= _height/_originalHeight;
 			}
-			_isTransformDirty	= true;
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransform();
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
 	
 	protected float _scaleX = 1.0f;
-	public float scaleX {
+	public virtual float scaleX {
     	get { return _scaleX; }
     	set { 
 			_scaleX = value;
 			if(_originalWidth!=0){
 				_width	= _scaleX*_originalWidth;
 			}
-			_isTransformDirty	= true;
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransform();
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
 	
 	protected float _scaleY = 1.0f;
-	public float scaleY {
+	public virtual float scaleY {
     	get { return _scaleY; }
     	set {
 			_scaleY = value;
 			if(_originalHeight!=0){
 				_height	= _scaleY*_originalHeight;
 			}
-			_isTransformDirty	= true;
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransform();
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
 	
 	protected float _rotation;
-	public float rotation {
+	public virtual float rotation {
     	get { return _rotation; }
     	set {
 			_rotation = value;
-			_isTransformDirty	= true;
-			if(_parent!=null){
-				_parent.setBoundRectDirty();
-			}
+			updateTransform();
+			updateTransformInTree();
+			updateRelatedBoundRect();
+			
 		}
 	}
-	
 	
 	
 	
@@ -229,9 +273,6 @@ public class DisplayObject : EventDispatcher {
 	protected bool	_isBoundRectDirty	= true;
 	public void setBoundRectDirty(){
 		_isBoundRectDirty	= true;
-		if(_parent!=null){
-			_parent.setBoundRectDirty();
-		}
 	}
 	
 	protected Rect _boundRect	= new Rect();
@@ -256,19 +297,12 @@ public class DisplayObject : EventDispatcher {
 	}
 	
 	public virtual void updateBoundRect(){
-		if(!_isBoundRectDirty){
-			return;
+		if(_parent!=null){
+			_parent.updateBoundRect();
 		}
-		_isBoundRectDirty	= false;
-		_selfBoundRect.x	= 0;
-		_selfBoundRect.y	= 0;
-		_selfBoundRect.width= _originalWidth/_scaleX;
-		_selfBoundRect.height=_originalHeight/_scaleY;
-		_boundRect.x		= _x;
-		_boundRect.y		= _y;
-		_boundRect.width	= _width;
-		_boundRect.height	= _height;
+		//need to be override
 	}
+	
 	
 	
 	
@@ -298,9 +332,7 @@ public class DisplayObject : EventDispatcher {
 	
 	public virtual void render(){
 		_alphaInTree	= _alpha * parent.alphaInTree;
-		if(!_visible && _alphaInTree<=0){
-			return;
-		}
+		//need to be override
 	}
 	
 	/***************************************
@@ -314,6 +346,7 @@ public class DisplayObject : EventDispatcher {
     	get { return _parent; }
     	set { 
 				_parent = value;
+				updateRelatedBoundRect();
 			}
 	}
 	
@@ -349,7 +382,11 @@ public class DisplayObject : EventDispatcher {
 		return isHit;
 	}
 	
+	//the touch instance will be cached in array if hit test valid
 	public virtual bool hitTestTouchDispatch(string type,Touch touch){
+		if(!mouseEnable || !_visible){
+			return false;
+		}
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		bool isHit	= false;
@@ -369,13 +406,16 @@ public class DisplayObject : EventDispatcher {
 	 * touches
 	 ***************************************/
 	
-	protected ArrayList _touchList	= new ArrayList();
+	protected List<Touch> _touchList	= new List<Touch>();
+	
 	protected int _swipeCounter		= 0;
+	protected string _swipeDirection;
+	
 	public virtual void clearTouchs(){
 		_touchList.Clear();
 	}
 	
 	public virtual void updateTouchs(){
-		
+		//need to be update
 	}
 }

@@ -3,50 +3,51 @@ using System.Collections;
 
 public class Stage : DisplayObjectContainer {
 
-	// Use this for initialization
 	
+	// instance
 	private static Stage _instance;
 	public static Stage instance {
 		
-    	get { return _instance; }
-    	private set { _instance = value;}
+    	get { 
+			if(_instance==null){
+				_instance	= new Stage();
+			}
+			return _instance;
+		}
 	}
 	
 	public Stage (){
 		_instance	= this;
 		_stage		= this;
-		id		= "stage";
-
+		id			= "stage";
+		updateTransform();
+		updateTransformInTree();
+		updateBoundRect();
 	}
+	
 	private bool _isFirstUpdateComplete	=false;
 	public bool isFirstUpdateComplete{
 		get { return _isFirstUpdateComplete;}
 	}
+	
 	public override void updateTransform ()
 	{
 		_isFirstUpdateComplete	= true;
 		base.updateTransform ();
 	}
+	
 	override public void render(){
 		//GUI.DrawTexture(_boundRectInRree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
-		
 		renderChildren();
 	}
 	
 	
 	override public void updateTransformInTree(){
 		
-		if(_isTransformInTreeDirty){
-			_isTransformInTreeDirty	= false;
-			_transformInTree		= _transform;
-			_transformInTreeScale	= new Vector2(1,1);
-			setBoundRectDirty();
-		}
+		_isTransformInTreeDirty	= false;
+		_transformInTree		= _transform;
+		_transformInTreeScale	= new Vector2(1,1);
 		
-		for(int i=0;i<_childList.Count;i++){
-			DisplayObject child = _childList[i] as DisplayObject;
-			child.updateTransformInTree();
-		}
 	}
 	
 	
@@ -59,10 +60,8 @@ public class Stage : DisplayObjectContainer {
 			child.parent.removeChild(child);
 		}
 		_childList.Add(child);
-		child.parent		= this;
 		child.stage			= this;
-		setTransformInTreeDirty();
-		setBoundRectDirty();
+		child.parent		= this;
 	}
 	
 	override public void addChildAt(int index, DisplayObject child){
@@ -73,10 +72,8 @@ public class Stage : DisplayObjectContainer {
 			child.parent.removeChild(child);
 		}
 		_childList.Insert(index,child);
-		child.parent		= this;
 		child.stage			= this;
-		setTransformInTreeDirty();
-		setBoundRectDirty();
+		child.parent		= this;
 	}
 	/********************************
 	 * touchs and mouse positions
@@ -153,12 +150,7 @@ public class Stage : DisplayObjectContainer {
 	
 	override public void updateBoundRect(){
 
-		for(int i=0;i<_childList.Count;i++){
-			(_childList[i] as DisplayObject).updateBoundRect();
-		}
-		if(!_isBoundRectDirty){
-			return;
-		}
+
 		_isBoundRectDirty	= false;
 		Vector2 minPos	= new Vector2(999999,999999);
 		Vector2 maxPos	= new Vector2(-999999,-999999);
@@ -183,20 +175,29 @@ public class Stage : DisplayObjectContainer {
 			}
 		}
 		
-		_originalWidth			= maxPos.x-minPos.x;
-		_originalHeight			= maxPos.y-minPos.y;
+		if(maxPos.x>minPos.x && maxPos.y>minPos.y){
+			_originalWidth			= maxPos.x-minPos.x;
+				
+			_originalHeight			= maxPos.y-minPos.y;
+			
+			
+			// get boundRect, boundRect is related with it's parent
+			_boundRect.x			= minPos.x;
+			_boundRect.y			= minPos.y;
+			_boundRect.width		= maxPos.x-minPos.x;
+			_boundRect.height		= maxPos.y-minPos.y;
+			_width					= _boundRect.width;
+			_height					= _boundRect.height;		
+		}else{
+			_boundRect.x			= 0;
+			_boundRect.y			= 0;
+			_boundRect.width		= 0;
+			_boundRect.height		= 0;
+			_width					= 0;
+			_height					= 0;
+		}
 		
-		
-		// get boundRect, boundRect is related with it's parent
-		_boundRect.x			= minPos.x;
-		_boundRect.y			= minPos.y;
-		_boundRect.width		= maxPos.x-minPos.x;
-		_boundRect.height		= maxPos.y-minPos.y;
-		_width					= _boundRect.width;
-		_height					= _boundRect.height;
-		
-		
-		_boundRectInTree	= _boundRect;
-		
+		_boundRectInTree		= _boundRect;
+		Debug.Log(id+ "updateBoundRect" + _boundRect);
 	}
 }

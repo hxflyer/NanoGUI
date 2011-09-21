@@ -1,13 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-public class EventTerm : Object {
+public class EventListenTerm{
 	
 	public EventDispatcher.CallBack function;
 	public string eventType;
 	
 	// Use this for initialization
-	public EventTerm (string type,EventDispatcher.CallBack func) {
+	public EventListenTerm (string type,EventDispatcher.CallBack func) {
 		eventType	= type;
 		function	= func;
 	}

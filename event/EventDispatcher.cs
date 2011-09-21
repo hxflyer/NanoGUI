@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EventDispatcher  {
 	
@@ -14,22 +15,22 @@ public class EventDispatcher  {
 
 		
 	}
-	protected ArrayList	eventHandlerList;
+	protected List<EventListenTerm>		_listenList;
+	protected static List<GuiEvent>		_dispatchList;
 	
 	public void addEventListner(string eventType,CallBack function){
-		if(eventHandlerList==null){
-			eventHandlerList	= new ArrayList();
+		if(_listenList==null){
+			_listenList		= new List<EventListenTerm>();
 		}
-		EventTerm eventTerm = new EventTerm(eventType,function);
-		eventHandlerList.Add(eventTerm);
+		_listenList.Add(new EventListenTerm(eventType,function));
 	}
 	
 	public void removeEventListner(string eventType,CallBack function){
 		int i=0;
-		if(i<eventHandlerList.Count){
-			EventTerm term = eventHandlerList[i] as EventTerm;
+		if(i<_listenList.Count){
+			EventListenTerm term = _listenList[i];
 			if(term.eventType==eventType && term.function==function){
-				eventHandlerList.Remove(term);
+				_listenList.Remove(term);
 			}else{
 				i++;
 			}
@@ -37,14 +38,27 @@ public class EventDispatcher  {
 	}
 	
 	public void dispatchEvent(GuiEvent e){
-		if(eventHandlerList==null){
-			return;
+		if(_dispatchList==null){
+			_dispatchList	= new List<GuiEvent>();
 		}
 		e.target	= this;
-		foreach(EventTerm term in eventHandlerList){
-			if(term.eventType == e.eventType){
-				term.function(e);
+		_dispatchList.Add(e);
+	}
+	
+	public static void sendEvents(){
+		if(_dispatchList!=null){
+			List<GuiEvent> temp	= new List<GuiEvent>(_dispatchList);
+			_dispatchList.Clear();
+			foreach(GuiEvent e in temp){
+				if(e.target._listenList!=null){
+					foreach(EventListenTerm listenTerm in e.target._listenList){
+						if(listenTerm.eventType == e.eventType){
+							listenTerm.function(e);
+						}
+					}
+				}
 			}
 		}
 	}
+	
 }
