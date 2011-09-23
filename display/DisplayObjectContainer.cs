@@ -123,7 +123,6 @@ public class DisplayObjectContainer : DisplayObject {
 		if(!_visible && _alphaInTree<=0){
 			return;
 		}
-		GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		renderChildren();
 	}
 	
@@ -168,7 +167,7 @@ public class DisplayObjectContainer : DisplayObject {
 		
 		//Debug.Log(id + "  updateBoundRect"+ _boundRect);
 		
-		if(_parent!=null){
+		if(_parent!=null && _parent.transformInTree!=null){
 			_boundRectInTree	= _parent.transformInTree.getBoundRect(_boundRect);
 		}
 		

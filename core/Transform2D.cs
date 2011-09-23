@@ -9,7 +9,7 @@ using System.Collections;
  *  | u v w  | 1
  */
 
-public class Transform2D : Object {
+public class Transform2D  {
 
 	
 	

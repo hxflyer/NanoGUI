@@ -64,15 +64,13 @@ public class Sprite : DisplayObjectContainer {
 	
 	override public void render(){
 		_alphaInTree	= _alpha * parent.alphaInTree;
+		
 		if(!_visible && _alphaInTree<=0){
 			return;
 		}
 		
 		if(_texture){
-			if(_transformInTree==null){
-				updateTransformInTree();
-				//Debug.Log("no transfrom in tree");
-			}
+			
 			_textureRenderRect.x	= _transformInTree.tx;
 			_textureRenderRect.y	= _transformInTree.ty;
 			_textureRenderRect.width	= _textureSelfRect.width * _transformInTreeScale.x;
@@ -81,12 +79,11 @@ public class Sprite : DisplayObjectContainer {
 			GUI.color = new Color( 1, 1, 1, _alphaInTree );
 			_texturRenderRotatePivot.x	= _transformInTree.tx;
 			_texturRenderRotatePivot.y	= _transformInTree.ty;
-			
 			GUIUtility.RotateAroundPivot (_transformInTreeRotation, _texturRenderRotatePivot);
-			//Debug.Log(id+" : "+_transformInTreeRotation);
+			//Debug.Log(id+" : "+_boundRectInTree);
 			GUI.DrawTexture(_textureRenderRect,_texture);
 			GUIUtility.RotateAroundPivot (-_transformInTreeRotation, _texturRenderRotatePivot);
-			GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+			//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		}
 		//Debug.Log("render:"+id+"  rect:"+_textureRenderRect);
 		renderChildren();
@@ -138,8 +135,9 @@ public class Sprite : DisplayObjectContainer {
 		_boundRect.height		= maxPos.y-minPos.y;
 		
 		
-		if(_parent!=null){
+		if(_parent!=null && _parent.transformInTree!=null){
 			_boundRectInTree		= _parent.transformInTree.getBoundRect(_boundRect);
+			
 		}		
 		
 		if(_texture!=null){
@@ -175,7 +173,7 @@ public class Sprite : DisplayObjectContainer {
 		_width					= _originalWidth*_scaleX;
 		_height					= _originalHeight*_scaleY;
 		
-		Debug.Log(id + "  updateBoundRectInTree"+_boundRectInTree);
+		
 	}
 	
 	

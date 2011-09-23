@@ -22,7 +22,7 @@ public class Stage : DisplayObjectContainer {
 		id			= "stage";
 		updateTransform();
 		updateTransformInTree();
-		updateBoundRect();
+		
 	}
 	
 	private bool _isFirstUpdateComplete	=false;
@@ -43,11 +43,7 @@ public class Stage : DisplayObjectContainer {
 	
 	
 	override public void updateTransformInTree(){
-		
-		_isTransformInTreeDirty	= false;
 		_transformInTree		= _transform;
-		_transformInTreeScale	= new Vector2(1,1);
-		
 	}
 	
 	

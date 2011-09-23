@@ -61,7 +61,7 @@ public class DisplayObject : EventDispatcher {
 	}
 	
 
-	protected Transform2D	_transformInTree;
+	protected Transform2D	_transformInTree	= new Transform2D();
 	
 	public Transform2D transformInTree {
     	get { return _transformInTree; }
@@ -108,7 +108,7 @@ public class DisplayObject : EventDispatcher {
 	//scale and rotation are both can be get from transformInTree, but it will need trigonometric calculation
 	//directly cache these as variable is cheaper
 	
-	protected Vector2 _transformInTreeScale;
+	protected Vector2 _transformInTreeScale	= new Vector2(1,1);
 	public Vector2 transformInTreeScale{
 		get {return _transformInTreeScale;}
 		private set {_transformInTreeScale = value;}
@@ -346,6 +346,8 @@ public class DisplayObject : EventDispatcher {
     	get { return _parent; }
     	set { 
 				_parent = value;
+				updateTransform();
+				updateTransformInTree();
 				updateRelatedBoundRect();
 			}
 	}
