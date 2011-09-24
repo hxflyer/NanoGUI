@@ -194,6 +194,6 @@ public class Stage : DisplayObjectContainer {
 		}
 		
 		_boundRectInTree		= _boundRect;
-		Debug.Log(id+ "updateBoundRect" + _boundRect);
+		//Debug.Log(id+ "updateBoundRect" + _boundRect);
 	}
 }

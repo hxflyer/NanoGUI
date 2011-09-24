@@ -194,7 +194,7 @@ public class DisplayObjectContainer : DisplayObject {
 		_width					= _originalWidth*_scaleX;
 		_height					= _originalHeight*_scaleY;
 		
-		Debug.Log(id + "  updateBoundRectInTree" + _boundRectInTree);
+		//Debug.Log(id + "  updateBoundRectInTree" + _boundRectInTree);
 	}
 	
 	
@@ -230,9 +230,9 @@ public class DisplayObjectContainer : DisplayObject {
 	
 	override public bool hittest(Vector2 vec){
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
-		if(!_boundRectInTree.Contains(vec)){
+		/*if(!_boundRectInTree.Contains(vec)){
 			return false;
-		}
+		}*/
 		bool isHit = false;
 		foreach(DisplayObject child in _childList){
 			if(child.hittest(vec)){
@@ -251,9 +251,9 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 
-		if(!_boundRectInTree.Contains(vec)){
+		/*if(!_boundRectInTree.Contains(vec)){
 			return false;
-		}
+		}*/
 		bool isHit = false;
 		foreach(DisplayObject child in _childList){
 			if(child.hitTestMouseDispatch(type,vec)){
@@ -275,9 +275,9 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
-		if(!_boundRectInTree.Contains(vec)){
+		/*if(!_boundRectInTree.Contains(vec)){
 			return false;
-		}
+		}*/
 		bool isHit = false;
 		DisplayObject child;
 		for(int i=_childList.Count-1;i>=0;i--){

@@ -184,9 +184,9 @@ public class Sprite : DisplayObjectContainer {
 
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		//Debug.Log(newVec);
-		if(!_boundRectInTree.Contains(vec)){
+		/*if(!_boundRectInTree.Contains(vec)){
 			return false;
-		}
+		}*/
 		if(_texture && _textureRenderRect.Contains(newVec)){
 			return true;
 		}
@@ -209,9 +209,9 @@ public class Sprite : DisplayObjectContainer {
 		}
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		//Debug.Log(id+"/"+ newVec + _selfBoundRect+_textureSelfRect);
-		if(!_boundRectInTree.Contains(vec)){
+		/*if(!_boundRectInTree.Contains(vec)){
 			return false;
-		}
+		}*/
 		bool isHit = false;
 		if(_texture && _textureSelfRect.Contains(newVec)){
 			isHit = true;
@@ -240,9 +240,9 @@ public class Sprite : DisplayObjectContainer {
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
 		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		
-		if(!_boundRectInTree.Contains(vec)){
+		/*if(!_boundRectInTree.Contains(vec)){
 			return false;
-		}
+		}*/
 		bool isHit = false;
 		if(_texture && _textureSelfRect.Contains(newVec)){
 			isHit = true;
