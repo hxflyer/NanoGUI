@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class NanoTween : EventDispatcher {
 
@@ -90,7 +91,7 @@ public class NanoTween : EventDispatcher {
 		
 		int i = 0;
 		string argName;
-		_argsName		= new ArrayList();
+		_argsName		= new List<string>();
 		_endArgs		= new ArrayList();
 		_startArgs		= new ArrayList();
 		
@@ -119,7 +120,7 @@ public class NanoTween : EventDispatcher {
 				_endArgs.Add(args[i+1]);
 				
 				_startArgs.Add(_target.GetType().GetProperty(argName).GetValue(_target,null));
-				//Debug.Log( argName+ " : "+ _target.GetType().GetProperty(argName).GetValue(_target,null));
+				
 			}
 			i += 2;
 		}
@@ -155,7 +156,7 @@ public class NanoTween : EventDispatcher {
 
 	private ArrayList _startArgs;
 	private ArrayList _endArgs;
-	private ArrayList _argsName;
+	private List<string> _argsName;
 	
 	
 	
@@ -173,6 +174,9 @@ public class NanoTween : EventDispatcher {
 	private float _delay	= 0;
 	private float _currentTime;
 	private float _startTime;
+	public float startTime{
+		get{return _startTime;}
+	}
 	private float _endTime;
 	
 	private float _percentage;
@@ -199,14 +203,16 @@ public class NanoTween : EventDispatcher {
 		
 		if(_percentage<1){
 			for (int i=0;i<_startArgs.Count;i++){
-				_target.GetType().GetProperty( _argsName[i] as string ).SetValue(target, _easeFunction( (float)_startArgs[i], (float)_endArgs[i], _percentage ), null);
+				if(_endArgs[i] is float){
+					_target.GetType().GetProperty(_argsName[i]).SetValue( target, _easeFunction( (float)_startArgs[i], (float)_endArgs[i], _percentage ), null);
+				}
 			}
 			if(_onUpdateCallBack!=null){
 				_onUpdateCallBack(_onUpdateParams);
 			}
 		}else{
 			for (int i=0;i<_startArgs.Count;i++){
-				_target.GetType().GetProperty( _argsName[i] as string ).SetValue( target, _endArgs[i], null );
+				_target.GetType().GetProperty(_argsName[i]).SetValue( target, _endArgs[i], null );
 			}
 			if(_onCompleteCallBack!=null){
 				_onCompleteCallBack(_onCompleteParams);

@@ -49,25 +49,26 @@ public class Stage : DisplayObjectContainer {
 	
 	
 	override public void addChild(DisplayObject child){
-		if(_childList.IndexOf(child)!=-1){
+		
+		if(_childList!=null && _childList.IndexOf(child)!=-1){
 			return;
 		}
 		if(child.parent!=null){
 			child.parent.removeChild(child);
 		}
-		_childList.Add(child);
+		getChildList().Add(child);
 		child.stage			= this;
 		child.parent		= this;
 	}
 	
 	override public void addChildAt(int index, DisplayObject child){
-		if(_childList.IndexOf(child)!=-1){
+		if(_childList!=null && _childList.IndexOf(child)!=-1){
 			return;
 		}
 		if(child.parent!=null){
 			child.parent.removeChild(child);
 		}
-		_childList.Insert(index,child);
+		getChildList().Insert(index,child);
 		child.stage			= this;
 		child.parent		= this;
 	}
@@ -81,7 +82,7 @@ public class Stage : DisplayObjectContainer {
 		get {return _touchAry;}
 	}
 	
-	public void updateTouches(Touch[] touchs){
+	public void storeTouche(Touch[] touchs){
 		
 		if(_touchAry!=null && _touchAry.Count>0){
 			_touchAry.Clear();
@@ -145,13 +146,14 @@ public class Stage : DisplayObjectContainer {
 	
 	
 	override public void updateBoundRect(){
-
-
-		_isBoundRectDirty	= false;
+		
+		if(_childList==null && _childList.Count==0){
+			return;
+		}
+		
 		Vector2 minPos	= new Vector2(999999,999999);
 		Vector2 maxPos	= new Vector2(-999999,-999999);
-		
-		
+
 		// loop though children to get the bound area of children
 		
 		foreach(DisplayObject child in _childList){

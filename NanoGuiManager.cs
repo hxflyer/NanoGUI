@@ -65,12 +65,13 @@ public class NanoGuiManager : MonoBehaviour {
 		 * the solo touch position and mouse position are cached in mouseX and mouseY property in rendering tree
 		 * this will clean the mouse position every frame, because on touch screen,fingers are not always touch the screen
 		 **/
-		Stage.instance.cleanMousePosition();
-		
+		if(!_isMouseDown){
+			Stage.instance.cleanMousePosition();
+		}
 		/*
 		 * this will go through the rendering tree to update touches
 		 **/
-		Stage.instance.updateTouches(Input.touches);
+		Stage.instance.storeTouche(Input.touches);
 		
 		/*
 		 * solo touch will treat like a mouse move: store the position to rendering tree  
@@ -85,6 +86,7 @@ public class NanoGuiManager : MonoBehaviour {
 		  * with each display object, the touch instances will be cached in different display objects if hited with touch point
 		  * so this hittest-cache loop need to be clear once per frame
 		 **/
+		
 		Stage.instance.clearTouchs();
 		
 		//send the touch to do hittest-cache one by one
@@ -114,7 +116,7 @@ public class NanoGuiManager : MonoBehaviour {
 		//EventDispatcher.clearEvents();
 	}
 	
-	
+	private bool _isMouseDown	= false;
 	//OnGUI is called 4 times per frame, this is depends on user's hardware
 	void OnGUI(){
 		
@@ -129,6 +131,7 @@ public class NanoGuiManager : MonoBehaviour {
 		//mouse event
 		
 		if (Event.current.button == 0 ){
+			
 			if(Event.current.type == EventType.MouseMove) {
 				
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
@@ -138,12 +141,12 @@ public class NanoGuiManager : MonoBehaviour {
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				
 			}else if (Event.current.type == EventType.MouseDown) {
-				
+				_isMouseDown	= true;
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				Stage.instance.hitTestMouseDispatch(MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
 				
 			}else if (Event.current.type == EventType.MouseUp) {
-
+				_isMouseDown	= false;
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				Stage.instance.hitTestMouseDispatch(MouseEvent.MOUSE_UP,Event.current.mousePosition);
 				

@@ -83,7 +83,7 @@ public class Sprite : DisplayObjectContainer {
 			//Debug.Log(id+" : "+_boundRectInTree);
 			GUI.DrawTexture(_textureRenderRect,_texture);
 			GUIUtility.RotateAroundPivot (-_transformInTreeRotation, _texturRenderRotatePivot);
-			//GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
+			GUI.DrawTexture(_boundRectInTree,Resources.Load("frame",typeof(Texture2D)) as Texture2D);
 		}
 		//Debug.Log("render:"+id+"  rect:"+_textureRenderRect);
 		renderChildren();
@@ -92,13 +92,14 @@ public class Sprite : DisplayObjectContainer {
 	
 	
 	override public void updateBoundRect(){
+		
 		Vector2 minPos = new Vector2();
 		Vector2 maxPos = new Vector2();
 		
-		
+		Rect textureRect	= new Rect();
 		if(_texture!=null){
 			
-			Rect textureRect	= _transform.getBoundRect(_textureSelfRect);
+			textureRect	= _transform.getBoundRect(_textureSelfRect);
 			minPos.x	= textureRect.x;
 			minPos.y	= textureRect.y;
 			maxPos.x	= textureRect.width+textureRect.x;
@@ -108,32 +109,46 @@ public class Sprite : DisplayObjectContainer {
 			minPos.y	= 999999;
 			maxPos.x	= -999999;
 			maxPos.y	= -999999;
+			
 		}
 		// loop though children to get the bound area of children
 		
-		
-		foreach(DisplayObject child in _childList){
-			
-			Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
-			if(childBoundRect.x < minPos.x){
-				minPos.x	= childBoundRect.x;
+		if(_childList!=null && _childList.Count>0){
+			foreach(DisplayObject child in _childList){
+				
+				Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
+				if(childBoundRect.x < minPos.x){
+					minPos.x	= childBoundRect.x;
+				}
+				if(childBoundRect.x+childBoundRect.width > maxPos.x){
+					maxPos.x	= childBoundRect.x+childBoundRect.width;
+				}
+				if(childBoundRect.y < minPos.y){
+					minPos.y	= childBoundRect.y;
+				}
+				if(childBoundRect.y+childBoundRect.height > maxPos.y){
+					maxPos.y	= childBoundRect.y+childBoundRect.height;
+				}
 			}
-			if(childBoundRect.x+childBoundRect.width > maxPos.x){
-				maxPos.x	= childBoundRect.x+childBoundRect.width;
-			}
-			if(childBoundRect.y < minPos.y){
-				minPos.y	= childBoundRect.y;
-			}
-			if(childBoundRect.y+childBoundRect.height > maxPos.y){
-				maxPos.y	= childBoundRect.y+childBoundRect.height;
+			// get boundRect, boundRect is related with it's parent
+			_boundRect.x			= minPos.x;
+			_boundRect.y			= minPos.y;
+			_boundRect.width		= maxPos.x-minPos.x;
+			_boundRect.height		= maxPos.y-minPos.y;
+		}else{
+			if(_texture!=null){
+				_boundRect.x			= textureRect.x;
+				_boundRect.y			= textureRect.y;
+				_boundRect.width		= textureRect.width;
+				_boundRect.height		= textureRect.height;
+			}else{
+				_boundRect.x			= 0;
+				_boundRect.y			= 0;
+				_boundRect.width		= 0;
+				_boundRect.height		= 0;
+				
 			}
 		}
-		// get boundRect, boundRect is related with it's parent
-		_boundRect.x			= minPos.x;
-		_boundRect.y			= minPos.y;
-		_boundRect.width		= maxPos.x-minPos.x;
-		_boundRect.height		= maxPos.y-minPos.y;
-		
 		
 		if(_parent!=null && _parent.transformInTree!=null){
 			_boundRectInTree		= _parent.transformInTree.getBoundRect(_boundRect);
@@ -151,28 +166,41 @@ public class Sprite : DisplayObjectContainer {
 			maxPos.x	= -999999;
 			maxPos.y	= -999999;
 		}
-		foreach(DisplayObject child in _childList){
+		if(_childList!=null && _childList.Count>0){
+			foreach(DisplayObject child in _childList){
+				
+				
+				if(child.boundRect.x < minPos.x){
+					minPos.x	= child.boundRect.x;
+				}
+				if(child.boundRect.x+child.boundRect.width > maxPos.x){
+					maxPos.x	= child.boundRect.x+child.boundRect.width;
+				}
+				if(child.boundRect.y < minPos.y){
+					minPos.y	= child.boundRect.y;
+				}
+				if(child.boundRect.y+child.boundRect.height > maxPos.y){
+					maxPos.y	= child.boundRect.y+child.boundRect.height;
+				}
+			}
 			
-			
-			if(child.boundRect.x < minPos.x){
-				minPos.x	= child.boundRect.x;
-			}
-			if(child.boundRect.x+child.boundRect.width > maxPos.x){
-				maxPos.x	= child.boundRect.x+child.boundRect.width;
-			}
-			if(child.boundRect.y < minPos.y){
-				minPos.y	= child.boundRect.y;
-			}
-			if(child.boundRect.y+child.boundRect.height > maxPos.y){
-				maxPos.y	= child.boundRect.y+child.boundRect.height;
+			_originalWidth			= maxPos.x-minPos.x;
+			_originalHeight			= maxPos.y-minPos.y;
+			_width					= _originalWidth*_scaleX;
+			_height					= _originalHeight*_scaleY;
+		}else{
+			if(_texture!=null){
+				_originalWidth		= _textureSelfRect.width;
+				_originalHeight		= _textureSelfRect.height;
+				_width				= _originalWidth*_scaleX;
+				_height				= _originalHeight*_scaleY;
+			}else{
+				_originalWidth		= 0;
+				_originalHeight		= 0;
+				_width				= 0;
+				_height				= 0;
 			}
 		}
-		
-		_originalWidth			= maxPos.x-minPos.x;
-		_originalHeight			= maxPos.y-minPos.y;
-		_width					= _originalWidth*_scaleX;
-		_height					= _originalHeight*_scaleY;
-		
 		
 	}
 	
@@ -192,13 +220,15 @@ public class Sprite : DisplayObjectContainer {
 		}
 		bool isHit = false;
 		DisplayObject child;
-		for(int i=_childList.Count-1;i>=0;i--){
-			child	= _childList[i] as DisplayObject;
-			if(child.hittest(vec)){
-				isHit	= true;
-				break;
+		if(_childList!=null && _childList.Count>0){
+			for(int i=_childList.Count-1;i>=0;i--){
+				child	= _childList[i] as DisplayObject;
+				if(child.hittest(vec)){
+					isHit	= true;
+					break;
+				}
+				
 			}
-			
 		}
 		return isHit;
 	}
@@ -219,13 +249,15 @@ public class Sprite : DisplayObjectContainer {
 		}
 		
 		DisplayObject child;
-		for(int i=_childList.Count-1;i>=0;i--){
-			child	= _childList[i] as DisplayObject;
-			if(child.hitTestMouseDispatch(type,vec)){
-				isHit	= true;
-				break;
+		if(_childList!=null && _childList.Count>0){
+			for(int i=_childList.Count-1;i>=0;i--){
+				child	= _childList[i] as DisplayObject;
+				if(child.hitTestMouseDispatch(type,vec)){
+					isHit	= true;
+					break;
+				}
+				
 			}
-			
 		}
 		//Debug.Log(id+"  mouse hit test "+ isHit);
 		if(isHit){
@@ -251,13 +283,15 @@ public class Sprite : DisplayObjectContainer {
 		}
 		
 		DisplayObject child;
-		for(int i=_childList.Count-1;i>=0;i--){
-			child	= _childList[i] as DisplayObject;
-			if(child.hitTestTouchDispatch(type,touch)){
-				isHit	= true;
-				break;
+		if(_childList!=null && _childList.Count>0){
+			for(int i=_childList.Count-1;i>=0;i--){
+				child	= _childList[i] as DisplayObject;
+				if(child.hitTestTouchDispatch(type,touch)){
+					isHit	= true;
+					break;
+				}
+				
 			}
-			
 		}
 		if(isHit){
 			_touchList.Add(touch);
