@@ -35,10 +35,8 @@ public class DisplayObjectContainer : DisplayObject {
 	
 	override public void dispatchEnterFrame(){
 		this.dispatchEvent(new GuiEvent(GuiEvent.ENTER_FRAME));
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				child.dispatchEnterFrame();
-			}
+		foreach(DisplayObject child in _childList){
+			child.dispatchEnterFrame();
 		}
 	}
 	
@@ -47,38 +45,33 @@ public class DisplayObjectContainer : DisplayObject {
 	 ***************************************/
 	
 	//this array is for cache rendering tree
-	protected List<DisplayObject> _childList;
+	protected List<DisplayObject> _childList	= new List<DisplayObject>();
 	
 	public List<DisplayObject> childList {
     	get { return _childList; }
     	private set { _childList = value;}
 	}
-	protected List<DisplayObject> getChildList(){
-		if(_childList==null){
-			_childList	= new List<DisplayObject>();
-		}
-		return(_childList);
-	}
+	
 	public virtual void addChild(DisplayObject child){
-		if(_childList!=null && _childList.IndexOf(child)!=-1){
+		if(_childList.IndexOf(child)!=-1){
 			return;
 		}
 		if(child.parent!=null){
 			child.parent.removeChild(child);
 		}
-		getChildList().Add(child);
+		_childList.Add(child);
 		child.stage			= _stage;
 		child.parent		= this;
 	}
 	
 	public virtual void addChildAt(int index, DisplayObject child){
-		if(_childList!=null && _childList.IndexOf(child)!=-1){
+		if(_childList.IndexOf(child)!=-1){
 			return;
 		}
 		if(child.parent!=null){
 			child.parent.removeChild(child);
 		}
-		getChildList().Insert(index,child);
+		_childList.Insert(index,child);
 		child.stage			= _stage;
 		child.parent		= this;
 	}
@@ -97,14 +90,10 @@ public class DisplayObjectContainer : DisplayObject {
 	}
 	
 	public bool hasChild(DisplayObject child){
-		return(_childList!=null && !(_childList.IndexOf(child)==-1));
+		return(!(_childList.IndexOf(child)==-1));
 	}
 	
 	public void removeAllChildren(){
-		if(_childList==null || _childList.Count==0){
-			return;
-		}
-		
 		foreach(DisplayObject child in _childList){
 			child.stage		= null;
 			child.parent	= null;
@@ -118,6 +107,12 @@ public class DisplayObjectContainer : DisplayObject {
 	}
 	
 	
+	override public void updateTransformInTree(){
+		base.updateTransformInTree();
+		foreach(DisplayObject child in _childList){
+			child.updateTransformInTree();
+		}
+	}
 	
 	/***************************************
 	 * render
@@ -132,31 +127,10 @@ public class DisplayObjectContainer : DisplayObject {
 	}
 	
 	protected void renderChildren(){
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				child.render();
-			}
+		foreach(DisplayObject child in _childList){
+			child.render();
 		}
 	}
-	
-	
-	
-	
-	/***************************************
-	 * transforms
-	 ***************************************/
-	
-	
-	override public void updateTransformInTree(){
-		base.updateTransformInTree();
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				child.updateTransformInTree();
-			}
-		}
-	}
-	
-	
 	
 	
 	/***************************************
@@ -164,87 +138,74 @@ public class DisplayObjectContainer : DisplayObject {
 	 ***************************************/
 	//bound rect is the rendering bound rect on stage
 	//using for hittest
+	
 	override public void updateBoundRect(){
+		Vector2 minPos	= new Vector2(999999,999999);
+		Vector2 maxPos	= new Vector2(-999999,-999999);
 		// loop though children to get the bound area of children
 		
-		if(_childList!=null && _childList.Count>0){
-			Vector2 minPos	= new Vector2(999999,999999);
-			Vector2 maxPos	= new Vector2(-999999,-999999);
-			foreach(DisplayObject child in _childList){
-				
-				Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
-				if(childBoundRect.x < minPos.x){
-					minPos.x	= childBoundRect.x;
-				}
-				if(childBoundRect.x+childBoundRect.width > maxPos.x){
-					maxPos.x	= childBoundRect.x+childBoundRect.width;
-				}
-				if(childBoundRect.y < minPos.y){
-					minPos.y	= childBoundRect.y;
-				}
-				if(childBoundRect.y+childBoundRect.height > maxPos.y){
-					maxPos.y	= childBoundRect.y+childBoundRect.height;
-				}
+		foreach(DisplayObject child in _childList){
+			
+			Rect childBoundRect	= _transform.getBoundRect(child.boundRect);
+			if(childBoundRect.x < minPos.x){
+				minPos.x	= childBoundRect.x;
 			}
-		
-			_boundRect.x			= minPos.x;
-			_boundRect.y			= minPos.y;
-			_boundRect.width		= maxPos.x-minPos.x;
-			_boundRect.height		= maxPos.y-minPos.y;
-		}else{
-			_boundRect.x			= 0;
-			_boundRect.y			= 0;
-			_boundRect.width		= 0;
-			_boundRect.height		= 0;
+			if(childBoundRect.x+childBoundRect.width > maxPos.x){
+				maxPos.x	= childBoundRect.x+childBoundRect.width;
+			}
+			if(childBoundRect.y < minPos.y){
+				minPos.y	= childBoundRect.y;
+			}
+			if(childBoundRect.y+childBoundRect.height > maxPos.y){
+				maxPos.y	= childBoundRect.y+childBoundRect.height;
+			}
 		}
+		
+		_boundRect.x			= minPos.x;
+		_boundRect.y			= minPos.y;
+		_boundRect.width		= maxPos.x-minPos.x;
+		_boundRect.height		= maxPos.y-minPos.y;
+		
+		//Debug.Log(id + "  updateBoundRect"+ _boundRect);
 		
 		if(_parent!=null && _parent.transformInTree!=null){
 			_boundRectInTree	= _parent.transformInTree.getBoundRect(_boundRect);
 		}
 		
-		if(_childList!=null && _childList.Count>0){
-			Vector2 minPos	= new Vector2(999999,999999);
-			Vector2 maxPos	= new Vector2(-999999,-999999);
-			
-			if(_childList!=null){
-				foreach(DisplayObject child in _childList){
-					if(child.boundRect.x < minPos.x){
-						minPos.x	= child.boundRect.x;
-					}
-					if(child.boundRect.x+child.boundRect.width > maxPos.x){
-						maxPos.x	= child.boundRect.x+child.boundRect.width;
-					}
-					if(child.boundRect.y < minPos.y){
-						minPos.y	= child.boundRect.y;
-					}
-					if(child.boundRect.y+child.boundRect.height > maxPos.y){
-						maxPos.y	= child.boundRect.y+child.boundRect.height;
-					}
-				}
+		minPos	= new Vector2(999999,999999);
+		maxPos	= new Vector2(-999999,-999999);
+		
+		
+		foreach(DisplayObject child in _childList){
+			if(child.boundRect.x < minPos.x){
+				minPos.x	= child.boundRect.x;
 			}
-		//original size has nothing to do with transform
-			_originalWidth			= maxPos.x-minPos.x;
-			_originalHeight			= maxPos.y-minPos.y;
-			_width					= _originalWidth*_scaleX;
-			_height					= _originalHeight*_scaleY;
-		}else{
-			_originalWidth			= 0;
-			_originalHeight			= 0;
-			_width					= 0;
-			_height					= 0;
+			if(child.boundRect.x+child.boundRect.width > maxPos.x){
+				maxPos.x	= child.boundRect.x+child.boundRect.width;
+			}
+			if(child.boundRect.y < minPos.y){
+				minPos.y	= child.boundRect.y;
+			}
+			if(child.boundRect.y+child.boundRect.height > maxPos.y){
+				maxPos.y	= child.boundRect.y+child.boundRect.height;
+			}
 		}
+		_originalWidth			= maxPos.x-minPos.x;
+		_originalHeight			= maxPos.y-minPos.y;
+		_width					= _originalWidth*_scaleX;
+		_height					= _originalHeight*_scaleY;
+		
+		//Debug.Log(id + "  updateBoundRectInTree" + _boundRectInTree);
 	}
 	
 	
-	//update parents bound rect and children bound rect
+	
 	override public void updateRelatedBoundRect(){
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				if(child is DisplayObjectContainer){
-					(child as DisplayObjectContainer).updateChildBoundRect();
-				}else{
-					child.updateBoundRect();
-				}
+		foreach(DisplayObject child in _childList){
+			if(child is DisplayObjectContainer){
+				(child as DisplayObjectContainer).updateChildBoundRect();
+			}else{
+				child.updateBoundRect();
 			}
 		}
 		updateBoundRect();
@@ -252,15 +213,12 @@ public class DisplayObjectContainer : DisplayObject {
 			_parent.updateParentBoundRect();
 		}
 	}
-	
 	public virtual void updateChildBoundRect(){
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				if(child is DisplayObjectContainer){
-					(child as DisplayObjectContainer).updateChildBoundRect();
-				}else{
-					child.updateBoundRect();
-				}
+		foreach(DisplayObject child in _childList){
+			if(child is DisplayObjectContainer){
+				(child as DisplayObjectContainer).updateChildBoundRect();
+			}else{
+				child.updateBoundRect();
 			}
 		}
 		updateBoundRect();
@@ -272,24 +230,22 @@ public class DisplayObjectContainer : DisplayObject {
 	 ***************************************/
 	
 	override public bool hittest(Vector2 vec){
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;
 		DisplayObject child;
-		if(_childList!=null && _childList.Count>0){
-			for(int i=_childList.Count-1;i>=0;i--){
-				child	= _childList[i] as DisplayObject;
-				if(child.hittest(vec)){
-					isHit	= true;
-					break;
-				}
-				
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hittest(vec)){
+				isHit	= true;
+				break;
 			}
+			
 		}
 		return isHit;
 	}
-	
 	
 	//mouse event hit test, dispatch the mouse event if hittest valid
 	override public bool hitTestMouseDispatch(string type,Vector2 vec){
@@ -303,15 +259,13 @@ public class DisplayObjectContainer : DisplayObject {
 		}
 		bool isHit = false;
 		DisplayObject child;
-		if(_childList!=null && _childList.Count>0){
-			for(int i=_childList.Count-1;i>=0;i--){
-				child	= _childList[i] as DisplayObject;
-				if(child.hitTestMouseDispatch(type,vec)){
-					isHit	= true;
-					break;
-				}
-				
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hitTestMouseDispatch(type,vec)){
+				isHit	= true;
+				break;
 			}
+			
 		}
 		if(isHit){
 			this.dispatchEvent(new MouseEvent(type,newVec,vec));
@@ -325,20 +279,19 @@ public class DisplayObjectContainer : DisplayObject {
 			return false;
 		}
 		Vector2 vec = new Vector2(touch.position.x,Stage.instance.stageHeight- touch.position.y);
+		Vector2 newVec = transformInTreeInverted.transformVector(vec);
 		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
 		bool isHit = false;
 		DisplayObject child;
-		if(_childList!=null && _childList.Count>0){
-			for(int i=_childList.Count-1;i>=0;i--){
-				child	= _childList[i] as DisplayObject;
-				if(child.hitTestTouchDispatch(type,touch)){
-					isHit	= true;
-					break;
-				}
-				
+		for(int i=_childList.Count-1;i>=0;i--){
+			child	= _childList[i] as DisplayObject;
+			if(child.hitTestTouchDispatch(type,touch)){
+				isHit	= true;
+				break;
 			}
+			
 		}
 		if(isHit){
 			_touchList.Add(touch);
@@ -349,10 +302,8 @@ public class DisplayObjectContainer : DisplayObject {
 	
 	
 	override public void clearTouchs(){
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				child.clearTouchs();
-			}
+		foreach(DisplayObject child in _childList){
+			child.clearTouchs();
 		}
 		_touchList.Clear();
 	}
@@ -367,17 +318,84 @@ public class DisplayObjectContainer : DisplayObject {
 	// recognize gesture and dispatch gesture events
 	
 	override public void updateTouchs(){
-
 		
 		if(!mouseEnable || !_visible || _touchList.Count==0){
 			return;
 		}
-		//Debug.Log("updateTouchs");
-		if(_childList!=null && _childList.Count>0){
-			foreach(DisplayObject child in _childList){
-				child.updateTouchs();
+		foreach(DisplayObject child in _childList){
+			child.updateTouchs();
+		}
+		
+		if(_touchList.Count==1){
+			//if only one finger touch this object, check if the swipe gesture valid
+			Touch soloTouch	= (Touch)_touchList[0];
+			
+			if(soloTouch.phase	== TouchPhase.Ended){
+				if(_swipeCounter>GestureEvent.swipeCountThreshold){
+					GestureEvent e = new GestureEvent(GestureEvent.SWIPE);
+					e.swipeDirection = _swipeDirection;
+					_swipeDirection	= null;
+					this.dispatchEvent(e);
+				}
+				_swipeCounter = 0;
+			}else if(soloTouch.phase == TouchPhase.Moved || soloTouch.phase	== TouchPhase.Began){
+				
+				if(Mathf.Abs(soloTouch.deltaPosition.x)>GestureEvent.swipeDeltaThreshold && 
+				   (soloTouch.deltaPosition.x>0?GestureEvent.SWIPE_RIGHT:GestureEvent.SWIPE_LEFT)==_swipeDirection){
+					if(_swipeCounter==0){
+						_swipeDirection	= soloTouch.deltaPosition.x>0?GestureEvent.SWIPE_RIGHT:GestureEvent.SWIPE_LEFT;
+					}
+					_swipeCounter ++;
+				}else{
+					_swipeCounter = 0;
+					_swipeDirection	= null;
+				}
+			}else{
+				_swipeCounter = 0;
+				_swipeDirection	= null;
+			}
+		
+		}
+		
+		if(_touchList.Count==2)
+		{
+			//if only one finger touch this object, check scale, rotate and pan
+			Touch firstTouch	= (Touch)_touchList[0];
+			Touch secondTouch	= (Touch)_touchList[1];
+			
+			//scale
+			
+			float lastDistance	= Vector2.Distance(firstTouch.position-firstTouch.deltaPosition,secondTouch.position-secondTouch.deltaPosition);
+			float distance		= Vector2.Distance(firstTouch.position,secondTouch.position);
+			float deltaScale	= distance/lastDistance;
+			
+			if(Mathf.Abs(deltaScale-1.0f)>0.001){
+				GestureEvent	e = new GestureEvent(GestureEvent.ZOOM);
+				e.deltaScale	= deltaScale;
+				this.dispatchEvent(e);
+			}
+			
+			//rotation
+			
+			float lastAng		= Mathf.Atan2( (secondTouch.position.y-secondTouch.deltaPosition.y)- (firstTouch.position.y-firstTouch.deltaPosition.y)  ,
+			                             (firstTouch.position.x-firstTouch.deltaPosition.x) - (secondTouch.position.x-secondTouch.deltaPosition.x))*Mathf.Rad2Deg;
+			float ang			= Mathf.Atan2(secondTouch.position.y - firstTouch.position.y , firstTouch.position.x - secondTouch.position.x)*Mathf.Rad2Deg;
+			float deltaRotation		= ang-lastAng;
+			if(Mathf.Abs(deltaRotation)>.01){
+				GestureEvent	e = new GestureEvent(GestureEvent.ROTATE);
+				e.deltaRotation	= deltaRotation;
+				this.dispatchEvent(e);
+			}
+			
+			//pan
+			
+			Vector2 avgDeltaPos	= (firstTouch.deltaPosition+secondTouch.deltaPosition)/2;
+			if(Mathf.Abs(avgDeltaPos.x)>GestureEvent.panThreshold || Mathf.Abs(avgDeltaPos.y)>GestureEvent.panThreshold){
+				GestureEvent	e = new GestureEvent(GestureEvent.PAN);
+				avgDeltaPos.y	= -avgDeltaPos.y;
+				e.deltaPan		= avgDeltaPos;
+				this.dispatchEvent(e);
 			}
 		}
-		base.updateTouchs();
 	}
 }

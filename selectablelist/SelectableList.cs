@@ -1,9 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SelectableList :SelectableItem {
 
-	protected ArrayList	_itemAry	= new ArrayList();
+	protected  List<SelectableItem>	_itemAry	= new List<SelectableItem>();
 	
 	public SelectableList (Texture2D texture):base(texture) {
 		

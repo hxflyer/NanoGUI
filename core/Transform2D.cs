@@ -267,7 +267,9 @@ public class Transform2D  {
 	}
 	
 	//transform vector
-	public Vector2	transformVector(Vector2 vec){		
+	public Vector2	transformVector(Vector2 vec){
+		Vector2 result	= new Vector2();
+		
 		return(new Vector2(a*vec.x+c*vec.y+tx,b*vec.x+d*vec.y+ty));
 	}
 	

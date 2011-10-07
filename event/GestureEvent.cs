@@ -13,8 +13,8 @@ public class GestureEvent : GuiEvent {
 	public static string PAN	= "pan";
 	
 	
-	public static float	swipeDeltaThreshold	= 5;
-	public static float	swipeCountThreshold	= 2;
+	public static float	swipeDeltaThreshold	= 3;
+	public static float	swipeCountThreshold	= 3;
 	public static float panThreshold	= 0.001f;
 	
 	public float deltaScale;
