@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 public class NanoTween : EventDispatcher {
 
@@ -26,7 +25,17 @@ public class NanoTween : EventDispatcher {
 		AddTween(tween);
 		return tween;
 	}
-	
+	public static void removeTweenOf(EventDispatcher target){
+		int i	= 0;
+		while (i< _tweenList.Count){
+			NanoTween tween	= _tweenList[i] as NanoTween;
+			if(tween.target == target){
+				RemoveTween(tween);
+			}else{
+				i++;
+			}
+		}
+	}
 	public static object[] Pack(params object[] args){
 		return args;
 	}	
@@ -91,13 +100,12 @@ public class NanoTween : EventDispatcher {
 		
 		int i = 0;
 		string argName;
-		_argsName		= new List<string>();
+		_argsName		= new ArrayList();
 		_endArgs		= new ArrayList();
 		_startArgs		= new ArrayList();
 		
 		while(i < args.Length - 1) {
 			argName	= args[i] as string;
-			
 			if(argName	== "ease"){
 				_easeType		= args[i+1] as string;
 				_easeFunction	= _ease.getEasingFunction(_easeType);
@@ -118,9 +126,7 @@ public class NanoTween : EventDispatcher {
 			}else{
 				_argsName.Add(argName);
 				_endArgs.Add(args[i+1]);
-				
 				_startArgs.Add(_target.GetType().GetProperty(argName).GetValue(_target,null));
-				
 			}
 			i += 2;
 		}
@@ -156,7 +162,7 @@ public class NanoTween : EventDispatcher {
 
 	private ArrayList _startArgs;
 	private ArrayList _endArgs;
-	private List<string> _argsName;
+	private ArrayList _argsName;
 	
 	
 	
@@ -174,9 +180,6 @@ public class NanoTween : EventDispatcher {
 	private float _delay	= 0;
 	private float _currentTime;
 	private float _startTime;
-	public float startTime{
-		get{return _startTime;}
-	}
 	private float _endTime;
 	
 	private float _percentage;
@@ -200,19 +203,16 @@ public class NanoTween : EventDispatcher {
 		_currentTime += Time.deltaTime;
 		_percentage	= _currentTime/_endTime;
 		
-		
 		if(_percentage<1){
 			for (int i=0;i<_startArgs.Count;i++){
-				if(_endArgs[i] is float){
-					_target.GetType().GetProperty(_argsName[i]).SetValue( target, _easeFunction( (float)_startArgs[i], (float)_endArgs[i], _percentage ), null);
-				}
+				_target.GetType().GetProperty( _argsName[i] as string ).SetValue(target, _easeFunction( (float)_startArgs[i], (float)_endArgs[i], _percentage ), null);
 			}
 			if(_onUpdateCallBack!=null){
 				_onUpdateCallBack(_onUpdateParams);
 			}
 		}else{
 			for (int i=0;i<_startArgs.Count;i++){
-				_target.GetType().GetProperty(_argsName[i]).SetValue( target, _endArgs[i], null );
+				_target.GetType().GetProperty( _argsName[i] as string ).SetValue( target, _endArgs[i], null );
 			}
 			if(_onCompleteCallBack!=null){
 				_onCompleteCallBack(_onCompleteParams);
