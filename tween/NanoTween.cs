@@ -46,6 +46,12 @@ public class NanoTween : EventDispatcher {
 		return delaycall;
 	}
 	
+	public static NanoDelayCall delayCall(float time,object target,CallBack delayCallBack){
+		NanoDelayCall delaycall	= new NanoDelayCall(time,target,delayCallBack);
+		_delayCallList.Add(delaycall);
+		return delaycall;
+	}
+	
 	public static void removeDelayCallOf(object target){
 		int i	= 0;
 		while (i< _tweenList.Count){

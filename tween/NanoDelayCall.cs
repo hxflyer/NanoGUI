@@ -30,6 +30,12 @@ public class NanoDelayCall:EventDispatcher  {
 		_callbackParams	= args;
 	}
 	
+	public NanoDelayCall(float delayTime,object target, NanoTween.CallBack delayCallBack){
+		_target			= target;
+		_endTime		= delayTime;
+		_delayCallBack	= delayCallBack;
+	}
+	
 	public void updateDelayCall(){
 		_currentTime	+= Time.deltaTime;
 		_percentage		= _currentTime/_endTime;
