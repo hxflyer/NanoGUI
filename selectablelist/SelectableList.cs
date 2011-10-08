@@ -42,7 +42,7 @@ public class SelectableList :SelectableItem {
 	}
 	
 	public void removeAllItems(){
-		for(int i=itemIndex;i<_itemAry.Count;i++){
+		for(int i=0;i<_itemAry.Count;i++){
 			_itemAry[i].parentList	= null;
 		}
 		_itemAry.RemoveAll();
