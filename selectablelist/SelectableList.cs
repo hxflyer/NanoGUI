@@ -36,16 +36,24 @@ public class SelectableList :SelectableItem {
 		removeChild(item);
 		item.parentList	= null;
 		for(int i=itemIndex;i<_itemAry.Count;i++){
-			(_itemAry[i] as SelectableItem).listIndex = i;
+			_itemAry[i].listIndex = i;
 		}
 		
+	}
+	
+	public void removeAllItems(){
+		for(int i=itemIndex;i<_itemAry.Count;i++){
+			_itemAry[i].parentList	= null;
+		}
+		_itemAry.RemoveAll();
+		this.removeAllChildren();
 	}
 	
 	public void removeItemAt(int itemIndex){
 		
 		_itemAry.RemoveAt(itemIndex);
 		for(int i=itemIndex;i<_itemAry.Count;i++){
-			(_itemAry[i] as SelectableItem).listIndex = i;
+			_itemAry[i].listIndex = i;
 		}
 	}
 	
