@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class NanoTween : EventDispatcher {
 
@@ -20,15 +21,17 @@ public class NanoTween : EventDispatcher {
 	public delegate void CallBack(object[] args);
 	
 	
-	public static NanoTween to(EventDispatcher target,float time,params object[] args){
+	public static NanoTween to(object target,float time,params object[] args){
 		NanoTween tween = new NanoTween(target,time,args);
 		AddTween(tween);
 		return tween;
 	}
-	public static void removeTweenOf(EventDispatcher target){
+	
+	
+	public static void removeTweenOf(object target){
 		int i	= 0;
 		while (i< _tweenList.Count){
-			NanoTween tween	= _tweenList[i] as NanoTween;
+			NanoTween tween	= _tweenList[i];
 			if(tween.target == target){
 				RemoveTween(tween);
 			}else{
@@ -36,6 +39,27 @@ public class NanoTween : EventDispatcher {
 			}
 		}
 	}
+	
+	public static NanoDelayCall delayCall(float time,object target,CallBack delayCallBack,object[] args){
+		NanoDelayCall delaycall	= new NanoDelayCall(time,target,delayCallBack,args);
+		_delayCallList.Add(delaycall);
+		return delaycall;
+	}
+	
+	public static void removeDelayCallOf(object target){
+		int i	= 0;
+		while (i< _tweenList.Count){
+			NanoDelayCall delaycall	= _delayCallList[i];
+			if(delaycall.target == target){
+				RemoveDelayCall(delaycall);
+			}else{
+				i++;
+			}
+		}
+	}
+	
+	
+	
 	public static object[] Pack(params object[] args){
 		return args;
 	}	
@@ -57,7 +81,8 @@ public class NanoTween : EventDispatcher {
 	 * all tween instances are stored in this array list;
 	 */
 	
-	private static ArrayList _tweenList = new ArrayList();
+	private static List<NanoTween> _tweenList 			= new List<NanoTween>();
+	private static List<NanoDelayCall> _delayCallList 	= new List<NanoDelayCall>();
 	
 	private static void AddTween(NanoTween tween){
 		_tweenList.Add(tween);
@@ -66,17 +91,29 @@ public class NanoTween : EventDispatcher {
 	private static void RemoveTween(NanoTween tween){
 		_tweenList.Remove(tween);
 	}
-	
+	private static void RemoveDelayCall(NanoDelayCall delaycall){
+		_delayCallList.Remove(delaycall);
+	}
 	/*
 	 * update need to be call every frame;
 	 */
 	public static void update(){
 		int i	= 0;
 		while (i< _tweenList.Count){
-			NanoTween tween	= _tweenList[i] as NanoTween;
+			NanoTween tween	= _tweenList[i];
 			tween.updateTween();
 			if(tween.percentage>=1){
 				RemoveTween(tween);
+			}else{
+				i++;
+			}
+		}
+		i=0;
+		while (i< _delayCallList.Count){
+			NanoDelayCall delayCall	= _delayCallList[i];
+			delayCall.updateDelayCall();
+			if(delayCall.percentage>=1){
+				RemoveDelayCall(delayCall);
 			}else{
 				i++;
 			}
@@ -87,7 +124,7 @@ public class NanoTween : EventDispatcher {
 	/*
 	 * instance intiation
 	 */
-	public NanoTween(EventDispatcher target,float time,params object[] args) {
+	public NanoTween(object target,float time,params object[] args) {
 		_target			= target;
 		_time			= time;
 		_easeFunction	= _ease.defaultEasingFunction;
@@ -139,8 +176,8 @@ public class NanoTween : EventDispatcher {
 	 * instance variable
 	 */
 	
-	private EventDispatcher _target;
-	public EventDispatcher target{
+	private object _target;
+	public object target{
 		get {return _target;}
 	}
 	
@@ -194,8 +231,13 @@ public class NanoTween : EventDispatcher {
 		
 		if(_delay>0){
 			_delay -=Time.deltaTime;
-			if(_delay<=0 && _onStartCallBack!=null){
-				_onStartCallBack(_onStartParams);
+			if(_delay<=0){
+				for (int i=0;i<_startArgs.Count;i++){
+					_startArgs[i] = _target.GetType().GetProperty( _argsName[i] as string ).GetValue(_target,null);
+				}
+				if(_onStartCallBack!=null){
+					_onStartCallBack(_onStartParams);
+				}
 			}
 			return;
 		}

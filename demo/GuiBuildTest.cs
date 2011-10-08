@@ -37,6 +37,13 @@ public class GuiBuildTest : MonoBehaviour {
 		s3.scaleY	= .3f;
 		s.addEventListner(MouseEvent.MOUSE_DOWN,new EventDispatcher.CallBack(clickHandler));
 		s.addEventListner(GuiEvent.ENTER_FRAME,new EventDispatcher.CallBack(enterFrameHandler));
+		
+		NanoTween.to(s,1f,NanoTween.Pack("x",100.0f));
+		NanoTween.to(s,1.5f,NanoTween.Pack("x",200.0f,"delay",1f));
+		NanoTween.delayCall(1f,this,new NanoTween.CallBack(delayCallBack),NanoTween.Pack(1));
+	}
+	void delayCallBack(object[] args){
+		_isRotate= !_isRotate;
 	}
 	private bool _isRotate	= false;
 	void clickHandler(GuiEvent e){
