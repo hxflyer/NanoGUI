@@ -65,7 +65,7 @@ public class NanoGuiManager : MonoBehaviour {
 		 * the solo touch position and mouse position are cached in mouseX and mouseY property in rendering tree
 		 * this will clean the mouse position every frame, because on touch screen,fingers are not always touch the screen
 		 **/
-		Stage.instance.cleanMousePosition();
+		//Stage.instance.cleanMousePosition();
 		
 		/*
 		 * this will go through the rendering tree to update touches
@@ -130,20 +130,16 @@ public class NanoGuiManager : MonoBehaviour {
 		
 		if (Event.current.button == 0 ){
 			if(Event.current.type == EventType.MouseMove) {
-				
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				
 			}else if (Event.current.type == EventType.MouseDrag) {
-				
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				
 			}else if (Event.current.type == EventType.MouseDown) {
-				
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				Stage.instance.hitTestMouseDispatch(MouseEvent.MOUSE_DOWN,Event.current.mousePosition);
 				
 			}else if (Event.current.type == EventType.MouseUp) {
-
 				Stage.instance.updateMousePosition(Event.current.mousePosition,Event.current.delta);
 				Stage.instance.hitTestMouseDispatch(MouseEvent.MOUSE_UP,Event.current.mousePosition);
 				

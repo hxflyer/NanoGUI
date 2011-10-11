@@ -170,6 +170,7 @@ public class NanoTween : EventDispatcher {
 				_argsName.Add(argName);
 				_endArgs.Add(args[i+1]);
 				_startArgs.Add(_target.GetType().GetProperty(argName).GetValue(_target,null));
+				
 			}
 			i += 2;
 		}

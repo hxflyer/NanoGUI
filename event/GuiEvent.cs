@@ -8,8 +8,8 @@ public class GuiEvent {
 	public static string CHANGE		= "change";
 	public static string COMPLETE	= "complete";
 	public static string RESIZE		= "resize";
-	public static string ENTER_FRAME = "enterframe";
-	public static string ADDED_TO_STAGE = "add to stage";
+	public static string ENTER_FRAME 		= "enterframe";
+	public static string ADDED_TO_STAGE 	= "add to stage";
 	public static string REMOVE_FROME_STAGE = "remove from stage";
 	public string eventType;
 	public EventDispatcher target;

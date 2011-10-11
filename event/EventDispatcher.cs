@@ -27,9 +27,9 @@ public class EventDispatcher  {
 	
 	public void removeEventListner(string eventType,CallBack function){
 		int i=0;
-		if(i<_listenList.Count){
+		while(i<_listenList.Count){
 			EventListenTerm term = _listenList[i];
-			if(term.eventType==eventType && term.function==function){
+			if(term.eventType==eventType && term.function.Equals(function)){
 				_listenList.Remove(term);
 			}else{
 				i++;
@@ -49,14 +49,20 @@ public class EventDispatcher  {
 		if(_dispatchList!=null){
 			List<GuiEvent> temp	= new List<GuiEvent>(_dispatchList);
 			_dispatchList.Clear();
-			foreach(GuiEvent e in temp){
+			int i = 0;
+			while (i<temp.Count){
+				GuiEvent e = temp[i];
 				if(e.target._listenList!=null){
-					foreach(EventListenTerm listenTerm in e.target._listenList){
+					int j = 0;
+					while(j<e.target._listenList.Count){
+						EventListenTerm listenTerm	= e.target._listenList[j];
 						if(listenTerm.eventType == e.eventType){
 							listenTerm.function(e);
 						}
+						j++;
 					}
 				}
+				i++;
 			}
 		}
 	}

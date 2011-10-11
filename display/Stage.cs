@@ -107,21 +107,21 @@ public class Stage : DisplayObjectContainer {
 		get {return _mouseY;}
 	}
 	
-	private int _lastMouseX = 0;
-	public int lastMouseX{
-		get {return _lastMouseX;}
+	private int _deltaMouseX = 0;
+	public int deltaMouseX{
+		get {return _deltaMouseX;}
 	}
 	
-	private int _lastMouseY = 0;
-	public int lastMouseY{
-		get {return _lastMouseY;}
+	private int _deltaMouseY = 0;
+	public int deltaMouseY{
+		get {return _deltaMouseY;}
 	}
 	
 	public void updateMousePosition(Vector2 mousePos,Vector2 deltaPos){
 		_mouseX	= (int)mousePos.x;
 		_mouseY	= (int)mousePos.y;
-		_lastMouseX = (int)deltaPos.x;
-		_lastMouseY = (int)deltaPos.y;
+		_deltaMouseX = (int)deltaPos.x;
+		_deltaMouseY = (int)deltaPos.y;
 	}
 	
 	public void cleanMousePosition(){

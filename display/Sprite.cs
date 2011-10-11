@@ -14,6 +14,7 @@ public class Sprite : DisplayObjectContainer {
 		_textureSelfRect.height= _texture.height;
 	}
 	
+	
 	public Sprite(Texture texture, float textureWidth,float textureHeight){
 		_texture	= texture;
 		_originalWidth	= textureWidth;
@@ -23,6 +24,12 @@ public class Sprite : DisplayObjectContainer {
 		_textureSelfRect.width = textureWidth;
 		_textureSelfRect.height= textureHeight;
 	}
+	
+	public void setHotAreaSize(float width, float height){
+		_textureSelfRect.width	= width;
+		_textureSelfRect.height	= height;
+	}
+
 	
 	public Sprite (){
 		
@@ -98,7 +105,7 @@ public class Sprite : DisplayObjectContainer {
 		Vector2 maxPos = new Vector2();
 		
 		
-		if(_texture!=null){
+		if(_textureSelfRect.width!=0 && _textureSelfRect.height!=0){
 			
 			Rect textureRect	= _transform.getBoundRect(_textureSelfRect);
 			minPos.x	= textureRect.x;
@@ -142,7 +149,8 @@ public class Sprite : DisplayObjectContainer {
 			
 		}		
 		
-		if(_texture!=null){
+		if(_textureSelfRect.width!=0 && _textureSelfRect.height!=0){
+		
 			minPos.x	= _textureSelfRect.x;
 			minPos.y	= _textureSelfRect.y;
 			maxPos.x	= _textureSelfRect.width+_textureSelfRect.x;
@@ -189,7 +197,7 @@ public class Sprite : DisplayObjectContainer {
 		if(!_boundRectInTree.Contains(vec)){
 			return false;
 		}
-		if(_texture && _textureRenderRect.Contains(newVec)){
+		if(_textureSelfRect.width!=0 && _textureSelfRect.height!=0 && _textureRenderRect.Contains(newVec)){
 			return true;
 		}
 		bool isHit = false;
@@ -216,7 +224,7 @@ public class Sprite : DisplayObjectContainer {
 			return false;
 		}
 		bool isHit = false;
-		if(_texture && _textureSelfRect.Contains(newVec)){
+		if(_textureSelfRect.width!=0 && _textureSelfRect.height!=0 && _textureSelfRect.Contains(newVec)){
 			isHit = true;
 		}
 		
@@ -248,7 +256,7 @@ public class Sprite : DisplayObjectContainer {
 			return false;
 		}
 		bool isHit = false;
-		if(_texture && _textureSelfRect.Contains(newVec)){
+		if(_textureSelfRect.width!=0 && _textureSelfRect.height!=0 && _textureSelfRect.Contains(newVec)){
 			isHit = true;
 		}
 		
